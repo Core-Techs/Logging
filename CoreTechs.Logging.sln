@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreTechs.Logging", "CoreTechs.Logging\CoreTechs.Logging.csproj", "{1A52E447-93C6-4CB3-8E25-F25195A95FB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreTechs.Logging.Tests", "CoreTechs.Logging.Tests\CoreTechs.Logging.Tests.csproj", "{61FE94BB-4A00-493E-AAFD-AA55E153F926}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A52E447-93C6-4CB3-8E25-F25195A95FB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A52E447-93C6-4CB3-8E25-F25195A95FB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A52E447-93C6-4CB3-8E25-F25195A95FB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A52E447-93C6-4CB3-8E25-F25195A95FB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61FE94BB-4A00-493E-AAFD-AA55E153F926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61FE94BB-4A00-493E-AAFD-AA55E153F926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61FE94BB-4A00-493E-AAFD-AA55E153F926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61FE94BB-4A00-493E-AAFD-AA55E153F926}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
