@@ -5,7 +5,7 @@ using System.Xml.Linq;
 namespace CoreTechs.Logging.Targets
 {
 
-    public abstract class PeriodicTarget : Target
+    public abstract class PeriodicTarget : Target, IConfigurableTarget
     {
         public enum PeriodicUnit
         {
@@ -15,7 +15,7 @@ namespace CoreTechs.Logging.Targets
             Hour,
             Week
         }
-        
+
         private readonly Timer _timer;
         private int _duration = 1;
 
@@ -68,9 +68,9 @@ namespace CoreTechs.Logging.Targets
             var now = DateTime.Now;
 
             var timeSpan = CalculateTimeSpan(Unit, Duration);
-            long periodsPassed = (now - theBeginning).Ticks / timeSpan.Ticks;
+            var periodsPassed = (now - theBeginning).Ticks / timeSpan.Ticks;
 
-            DateTime periodBegin = theBeginning.AddTicks(timeSpan.Ticks * periodsPassed);
+            var periodBegin = theBeginning.AddTicks(timeSpan.Ticks * periodsPassed);
             return periodBegin;
         }
 
@@ -104,10 +104,10 @@ namespace CoreTechs.Logging.Targets
 
         protected virtual void OnPeriodEnd() { }
 
-        public override void Configure(XElement xml)
+        public void Configure(XElement xml)
         {
-            Try.Do(() => Duration = Convert.ToInt32(xml.GetAttributeValue("duration")));
-            Try.Do(() => Unit = Enums.Parse<PeriodicUnit>(xml.GetAttributeValue("unit")));
+            Duration = Try.Get(() => int.Parse(xml.GetAttributeValue("duration")), 1).Value;
+            Unit = Try.Get(() => Enums.Parse<PeriodicUnit>(xml.GetAttributeValue("Unit"))).Value;
         }
     }
 }

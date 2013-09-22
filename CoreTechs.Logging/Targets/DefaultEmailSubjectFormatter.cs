@@ -1,10 +1,10 @@
 ﻿namespace CoreTechs.Logging.Targets
 {
-    internal class DefaultEmailSubjectFormatter : IEntryFormatter<string>
+    internal class DefaultEmailSubjectFormatter : IEntryConverter<string>
     {
-        public string Format(LogEntry entry)
+        public string Convert(LogEntry entry)
         {
-            return string.Format("{0} | {1}", entry.Level, entry.Source);
+            return string.Format("{0}: {1}", entry.Source, entry.Level);
         }
     }
 }

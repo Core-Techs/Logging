@@ -13,7 +13,7 @@ namespace CoreTechs.Logging.Targets
     /// A logger that will periodically send accumulated log entries via email.
     /// </summary>
     [FriendlyTypeName("PeriodicEmail")]
-    public class PeriodicEmailTarget : PeriodicTarget
+    public class PeriodicEmailTarget : PeriodicTarget, IConfigurableTarget
     {
         private bool _initialPeriodsSet;
         private readonly ReaderWriterLockSlim _tempFileLock = new ReaderWriterLockSlim();
@@ -29,7 +29,7 @@ namespace CoreTechs.Logging.Targets
         public string To { get; set; }
         public string Subject { get; set; }
 
-        public IEntryFormatter<string> EntryFormatter { get; set; }
+        public IEntryConverter<string> EntryFormatter { get; set; }
 
         public PeriodicEmailTarget()
         {
@@ -48,8 +48,8 @@ namespace CoreTechs.Logging.Targets
             {
                 lockmgr.EnterReadLock();
 
-                var fmt = EntryFormatter ?? entry.Logger.Config.GetFormatter<string>();
-                var msg = fmt.Format(entry);
+                var fmt = EntryFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
+                var msg = fmt.Convert(entry);
                 File.AppendAllText(_tempFile, msg);
             }
         }
@@ -77,7 +77,7 @@ namespace CoreTechs.Logging.Targets
 
                     mail.To.Add(To);
                     mail.Subject = Subject ?? string.Format("{0} Log Entries", AppDomain.CurrentDomain.FriendlyName);
-                    
+
                     mail.Body = File.ReadAllText(oldFile);
                     smtp.Send(mail);
                 }
@@ -90,7 +90,7 @@ namespace CoreTechs.Logging.Targets
             SetPeriods();
         }
 
-        public override void Configure(XElement xml)
+        public new void Configure(XElement xml)
         {
             base.Configure(xml);
 
@@ -98,6 +98,8 @@ namespace CoreTechs.Logging.Targets
             To = xml.GetAttributeValue("to");
             Subject = xml.GetAttributeValue("subject");
             SmtpClientFactory = ConstructOrDefault<ICreateSmtpClient>(xml.GetAttributeValue("SmtpClientFactory"));
+            EntryFormatter =
+                       ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("Formatter", "EntryFormatter"));
         }
     }
 }

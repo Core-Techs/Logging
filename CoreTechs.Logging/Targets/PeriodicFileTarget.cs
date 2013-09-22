@@ -10,9 +10,9 @@ namespace CoreTechs.Logging.Targets
     /// A logger that will log to various files that correspond to periods of time.
     /// </summary>
     [FriendlyTypeName("PeriodicFile")]
-    public class PeriodicFileLogger : PeriodicTarget
+    public class PeriodicFileTarget : PeriodicTarget, IConfigurableTarget
     {
-        public IEntryFormatter<string> EntryFormatter { get; set; }
+        public IEntryConverter<string> EntryFormatter { get; set; }
 
         /// <summary>
         /// The directory that log files will be written to. This directory should only be used for this logger when circular logging is enabled to keep other files from being overwritten.
@@ -24,19 +24,11 @@ namespace CoreTechs.Logging.Targets
         /// </summary>
         public int CirculationCount { get; set; }
 
-        public PeriodicFileLogger(string directoryPath)
-        {
-            if (string.IsNullOrEmpty(directoryPath))
-                throw new ArgumentNullException("directoryPath");
-
-            DirectoryPath = directoryPath;
-        }
-
         public override void Write(LogEntry entry)
         {
             // reset periods if time
             // determine if log file circulation should occur
-            bool circulate = false;
+            var circulate = false;
             if (DateTime.Now >= NextPeriodStart)
             {
                 SetPeriods();
@@ -46,8 +38,8 @@ namespace CoreTechs.Logging.Targets
             // log entry
             Directory.CreateDirectory(DirectoryPath);
             var filename = Path.Combine(DirectoryPath, GetCurrentFilename());
-            var formatter = EntryFormatter ?? entry.Logger.Config.GetFormatter<string>();
-            var msg = formatter.Format(entry);
+            var formatter = EntryFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
+            var msg = formatter.Convert(entry);
             File.AppendAllText(filename, msg);
 
             // circulate if needed
@@ -69,19 +61,18 @@ namespace CoreTechs.Logging.Targets
             return string.Format("{0:yyyyMMdd}_{0:HHmmss}.txt", ThisPeriodStart);
         }
 
-        public override void Configure(XElement xml)
+        public new void Configure(XElement xml)
         {
             base.Configure(xml);
 
             int int32;
             if (int.TryParse(xml.GetAttributeValue("CirculationCount", "Count"), out int32))
                 CirculationCount = int32;
-            
-            DirectoryPath = xml.GetAttributeValue("DirectoryPath");
-            EntryFormatter =
-                ConstructOrDefault<IEntryFormatter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
 
-            
+            DirectoryPath = xml.GetAttributeValue("DirectoryPath", "Path", "Directory", "Dir") ??
+                            Path.Combine(Environment.CurrentDirectory, "logs");
+            EntryFormatter =
+                ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
         }
     }
 }

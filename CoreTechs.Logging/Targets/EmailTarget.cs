@@ -1,11 +1,12 @@
 ﻿using System.Net.Mail;
 using System.Xml.Linq;
+using CoreTechs.Logging;
 using CoreTechs.Logging.Configuration;
 
 namespace CoreTechs.Logging.Targets
 {
     [FriendlyTypeName("Email")]
-    public class EmailTarget : Target
+    public class EmailTarget : Target, IConfigurableTarget
     {
         private ICreateSmtpClient _smtpClientFactory;
         public ICreateSmtpClient SmtpClientFactory
@@ -14,8 +15,8 @@ namespace CoreTechs.Logging.Targets
             set { _smtpClientFactory = value; }
         }
 
-        public IEntryFormatter<string> BodyFormatter { get; set; }
-        public IEntryFormatter<string> SubjectFormatter { get; set; }
+        public IEntryConverter<string> BodyFormatter { get; set; }
+        public IEntryConverter<string> SubjectFormatter { get; set; }
 
         public string From { get; set; }
         public string To { get; set; }
@@ -27,29 +28,29 @@ namespace CoreTechs.Logging.Targets
             using (var mail = new MailMessage())
             {
                 mail.To.Add(To);
-                
+
                 if (!From.IsNullOrWhitespace())
                     mail.From = new MailAddress(From);
 
                 var fmt = SubjectFormatter ?? new DefaultEmailSubjectFormatter();
-                mail.Subject = Subject ?? fmt.Format(entry);
+                mail.Subject = Subject ?? fmt.Convert(entry);
 
-                fmt = BodyFormatter ?? entry.Logger.Config.GetFormatter<string>();
-                mail.Body = fmt.Format(entry);
+                fmt = BodyFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
+                mail.Body = fmt.Convert(entry);
 
                 smtp.Send(mail);
             }
         }
 
-        public override void Configure(XElement xml)
+        public void Configure(XElement xml)
         {
             From = xml.GetAttributeValue("from");
             To = xml.GetAttributeValue("to");
             Subject = xml.GetAttributeValue("subject");
 
             SmtpClientFactory = ConstructOrDefault<ICreateSmtpClient>(xml.GetAttributeValue("SmtpClientFactory"));
-            BodyFormatter = ConstructOrDefault<IEntryFormatter<string>>(xml.GetAttributeValue("BodyFormatter"));
-            SubjectFormatter = ConstructOrDefault<IEntryFormatter<string>>(xml.GetAttributeValue("SubjectFormatter"));
+            BodyFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("BodyFormatter"));
+            SubjectFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("SubjectFormatter"));
         }
     }
 }

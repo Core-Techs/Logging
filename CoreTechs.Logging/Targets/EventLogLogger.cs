@@ -5,14 +5,14 @@ using CoreTechs.Logging.Configuration;
 namespace CoreTechs.Logging.Targets
 {
     [FriendlyTypeName("EventLog")]
-    public class EventLogTarget : Target
+    public class EventLogTarget : Target, IConfigurableTarget
     {
         /// <summary>
         /// The windows event log entry source.
         /// </summary>
         public string EventLogSource { get; set; }
 
-        public IEntryFormatter<string> EntryFormatter { get; set; }
+        public IEntryConverter<string> EntryFormatter { get; set; }
 
         public override void Write(LogEntry entry)
         {
@@ -39,18 +39,18 @@ namespace CoreTechs.Logging.Targets
 
             using (var eventLog = new EventLog { Source = EventLogSource ?? entry.Source })
             {
-                var fmt = EntryFormatter ?? entry.Logger.Config.GetFormatter<string>();
-                var msg = fmt.Format(entry);
+                var fmt = EntryFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
+                var msg = fmt.Convert(entry);
                 eventLog.WriteEntry(msg, type);
             }
         }
 
-        public override void Configure(XElement xml)
+        public void Configure(XElement xml)
         {
             EventLogSource = xml.GetAttributeValue("EventLogSource");
 
             EntryFormatter =
-                ConstructOrDefault<IEntryFormatter<string>>(xml.GetAttributeValue("Formatter", "EntryFormatter"));
+                ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("Formatter", "EntryFormatter"));
         }
     }
 }

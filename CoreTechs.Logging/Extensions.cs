@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Annotations;
@@ -32,6 +33,11 @@ namespace CoreTechs.Logging
         public static string GetAttributeValue(this XElement element, params string[] names)
         {
             return names.Select(element.GetAttributeValue).FirstOrDefault(a => a != null);
+        }
+
+        public static IEnumerable<XElement> Descendants(this XElement element, string name, StringComparison stringComparison)
+        {
+            return element.Descendants().Where(x => name.Equals(x.Name.ToString(), stringComparison));
         }
     }
 }

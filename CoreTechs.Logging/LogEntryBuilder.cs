@@ -19,11 +19,6 @@ namespace CoreTechs.Logging
 
         public LogEntry Entry { get; internal set; }
 
-        public void Write()
-        {
-            _logger.Write(Entry);
-        }
-
         public LogEntryBuilder Data(string key, object value)
         {
             Entry.Data[key] = value;
@@ -52,41 +47,41 @@ namespace CoreTechs.Logging
             return this;
         }
 
-        public LogEntryBuilder Level(Lvl level)
+        public void Level(Lvl level)
         {
             Entry.Level = level;
-            return this;
+            _logger.Write(Entry);
         }
 
-        
-        public LogEntryBuilder Trace()
+
+        public void Trace()
         {
-            return Level(Lvl.Trace);
+             Level(Lvl.Trace);
         }
 
-        public LogEntryBuilder Debug()
+        public void Debug()
         {
-            return Level(Lvl.Debug);
+             Level(Lvl.Debug);
         }
 
-        public LogEntryBuilder Info()
+        public void Info()
         {
-            return Level(Lvl.Info);
+             Level(Lvl.Info);
         }
 
-        public LogEntryBuilder Warn()
+        public void Warn()
         {
-            return Level(Lvl.Warn);
+             Level(Lvl.Warn);
         }
 
-        public LogEntryBuilder Error()
+        public void Error()
         {
-            return Level(Lvl.Error);
+             Level(Lvl.Error);
         }
 
-        public LogEntryBuilder Fatal()
+        public void Fatal()
         {
-            return Level(Lvl.Fatal);
+            Level(Lvl.Fatal);
         }
     }
 }

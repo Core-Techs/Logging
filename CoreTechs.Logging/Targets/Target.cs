@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -57,8 +56,6 @@ namespace CoreTechs.Logging.Targets
 
         internal void ConfigureInternal(XElement xml)
         {
-            // todo make this thing dynamic and robust
-
             var levels = xml.GetAttributeValue("level", "levels");
             var minlevel = xml.GetAttributeValue("minlevel");
             var maxlevel = xml.GetAttributeValue("maxlevel");
@@ -73,22 +70,17 @@ namespace CoreTechs.Logging.Targets
             if (!maxlevel.IsNullOrWhitespace())
                 MaxLevel = Enums.Parse<Level>(maxlevel);
 
-            Configure(xml);
+            var configurable = this as IConfigurableTarget;
+            if (configurable != null)
+                configurable.Configure(xml);
         }
 
-        public abstract void Configure(XElement xml);
 
         internal bool ShouldWriteInternal([NotNull] LogEntry entry)
         {
             if (entry == null) throw new ArgumentNullException("entry");
-            return ShouldWrite(entry)
-                   && Levels.Contains(entry.Level)
+            return Levels.Contains(entry.Level)
                    && (SourceRegex == null || SourceRegex.IsMatch(entry.Source));
-        }
-
-        public virtual bool ShouldWrite([NotNull] LogEntry entry)
-        {
-            return true;
         }
 
         protected T ConstructOrDefault<T>([NotNull] string name, IEnumerable<Assembly> assemblies = null)

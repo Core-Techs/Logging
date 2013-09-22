@@ -18,10 +18,5 @@ namespace CoreTechs.Logging.Targets
         {
             _writeAction(entry);
         }
-
-        public override void Configure(XElement xml)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

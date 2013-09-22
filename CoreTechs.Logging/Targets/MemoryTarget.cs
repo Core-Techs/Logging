@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace CoreTechs.Logging.Targets
 {
-    public class MemoryTarget:Target
+    public class MemoryTarget : Target, IConfigurableTarget
     {
         private readonly Queue<LogEntry> _entries = new Queue<LogEntry>();
 
@@ -19,7 +19,7 @@ namespace CoreTechs.Logging.Targets
                 return _entries.ToList().AsReadOnly();
             }
         }
-        public IEntryFormatter<string> EntryFormatter { get; set; }
+        public IEntryConverter<string> EntryFormatter { get; set; }
 
         public override void Write(LogEntry entry)
         {
@@ -32,7 +32,7 @@ namespace CoreTechs.Logging.Targets
         public string View()
         {
             return string.Join(Environment.NewLine,
-                _entries.Select((EntryFormatter ?? new DefaultStringFormatter()).Format));
+                _entries.Select((EntryFormatter ?? new DefaultStringConverter()).Convert));
         }
 
         public void Clear()
@@ -40,8 +40,11 @@ namespace CoreTechs.Logging.Targets
             _entries.Clear();
         }
 
-        public override void Configure(XElement xml)
+        public void Configure(XElement xml)
         {
+            EntryFormatter =
+                ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
+
             var cap = xml.GetAttributeValue("cap") ?? xml.GetAttributeValue("capacity");
             Capacity = int.Parse(cap);
         }

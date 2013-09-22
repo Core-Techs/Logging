@@ -23,7 +23,7 @@ namespace CoreTechs.Logging
             if (!t.IsEnum)
                 throw new InvalidOperationException("TEnum must be an enum type");
 
-            return (TEnum) Enum.Parse(t, s);
+            return (TEnum) Enum.Parse(t, s, true);
         }
     }
 }

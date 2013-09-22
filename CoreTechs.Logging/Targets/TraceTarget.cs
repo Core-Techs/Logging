@@ -5,21 +5,21 @@ using CoreTechs.Logging.Configuration;
 namespace CoreTechs.Logging.Targets
 {
     [FriendlyTypeName("Trace")]
-    public class TraceTarget : Target
+    public class TraceTarget : Target,IConfigurableTarget
     {
-        public IEntryFormatter<string> EntryFormatter { get; set; }
+        public IEntryConverter<string> EntryFormatter { get; set; }
 
         public override void Write(LogEntry entry)
         {
-            var fmt = EntryFormatter ?? entry.Logger.Config.GetFormatter<string>();
-            var msg = fmt.Format(entry);
+            var fmt = EntryFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
+            var msg = fmt.Convert(entry);
             Trace.WriteLine(msg);
         }
 
-        public override void Configure(XElement xml)
+        public void Configure(XElement xml)
         {
             EntryFormatter =
-                ConstructOrDefault<IEntryFormatter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
+                ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
         }
     }
 }

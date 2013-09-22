@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace CoreTechs.Logging
 {
-    public class DefaultStringFormatter : IEntryFormatter<string>
+    public class DefaultStringConverter : IEntryConverter<string>
     {
         private IFormatException _exceptionFormatter;
         public IFormatException ExceptionFormatter
@@ -14,13 +14,13 @@ namespace CoreTechs.Logging
             set { _exceptionFormatter = value; }
         }
 
-        public virtual string Format([NotNull] LogEntry entry)
+        public virtual string Convert([NotNull] LogEntry entry)
         {
             if (entry == null) throw new ArgumentNullException("entry");
 
             // entry heading
-            var sb = new StringBuilder().AppendFormat("{0} | {1} | {2}", entry.Level, entry.Source, entry.Created)
-                .AppendLine();
+            var sb = new StringBuilder().AppendFormat("{0} : {1} : {2}", entry.Source, entry.Level, entry.Created)
+                                        .AppendLine();
             using (var sw = new StringWriter(sb))
             using (var iw = new IndentedTextWriter(sw))
             {

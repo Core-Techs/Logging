@@ -7,9 +7,9 @@ namespace CoreTechs.Logging.Configuration
     {
         public string FriendlyTypeName { get; set; }
 
-        public FriendlyTypeNameAttribute(string FriendlyTypeName)
+        public FriendlyTypeNameAttribute(string friendlyTypeName)
         {
-            this.FriendlyTypeName = FriendlyTypeName;
+            this.FriendlyTypeName = friendlyTypeName;
         }
     }
 }

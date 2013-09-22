@@ -5,7 +5,7 @@ using CoreTechs.Logging.Configuration;
 namespace CoreTechs.Logging.Targets
 {
     [FriendlyTypeName("ColoredConsole")]
-    public class ColoredConsoleTarget : ConsoleTarget
+    public class ColoredConsoleTarget : ConsoleTarget, IConfigurableTarget
     {
         const ConsoleColor DefaultTraceColor = ConsoleColor.DarkGray;
         const ConsoleColor DefaultDebugColor = ConsoleColor.Gray;
@@ -67,7 +67,7 @@ namespace CoreTechs.Logging.Targets
             Console.ForegroundColor = color;
         }
 
-        public override void Configure(XElement xml)
+        public  void Configure(XElement xml)
         {
             base.Configure(xml);
 

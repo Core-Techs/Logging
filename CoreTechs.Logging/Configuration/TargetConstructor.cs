@@ -12,10 +12,7 @@ namespace CoreTechs.Logging.Configuration
 
         public TargetConstructor()
         {
-            _targetTypes = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                from type in assembly.GetTypes()
-                where typeof (Target).IsAssignableFrom(type)
-                select new TargetTypeInfo(type)).ToArray();
+            _targetTypes = Types.Implementing<Target>().Select(t => new TargetTypeInfo(t)).ToArray();
         }
 
         public Target Construct([NotNull] XElement config)
@@ -44,7 +41,7 @@ namespace CoreTechs.Logging.Configuration
                     throw new LoggingConfigurationException("Could not find a target type by the name " + typeName);
 
                 // construct target
-                var target = (Target) Activator.CreateInstance(targetType.TargetType);
+                var target = (Target)Activator.CreateInstance(targetType.TargetType);
                 target.ConfigureInternal(config);
                 return target;
             }
@@ -59,37 +56,28 @@ namespace CoreTechs.Logging.Configuration
         /// </summary>
         private TargetTypeInfo FindTargetTypeInfo(string typeName)
         {
-            // search for target by fullname
-            var targetType = (from lt in _targetTypes
-                              where lt.TargetType.FullName.Equals(typeName, StringComparison.OrdinalIgnoreCase)
-                              select lt).FirstOrDefault();
+            return
 
-            if (targetType != null)
-                return targetType;
+                // search by fullname
+                _targetTypes.FirstOrDefault(
+                    lt => lt.TargetType.FullName.Equals(typeName, StringComparison.OrdinalIgnoreCase))
 
-            // search by friendly name
-            targetType = (from lt in _targetTypes
-                          where lt.FriendlyTypeNameAttribute != null &&
-                            lt.FriendlyTypeNameAttribute.FriendlyTypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase)
-                          select lt).FirstOrDefault();
+                // search by friendly type name
+                ??
+                _targetTypes.FirstOrDefault(
+                    lt =>
+                    lt.FriendlyTypeNameAttribute != null &&
+                    lt.FriendlyTypeNameAttribute.FriendlyTypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase))
 
-            if (targetType != null)
-                return targetType;
+                // search by name
+                ??
+                _targetTypes.FirstOrDefault(
+                    lt => lt.TargetType.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase))
 
-            // search by name
-            targetType = (from lt in _targetTypes
-                          where lt.TargetType.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase)
-                          select lt).FirstOrDefault();
-
-            if (targetType != null)
-                return targetType;
-
-            // search by name starts with
-            targetType = (from lt in _targetTypes
-                          where lt.TargetType.Name.StartsWith(typeName, StringComparison.OrdinalIgnoreCase)
-                          select lt).FirstOrDefault();
-
-            return targetType;
+                // search by name startswith
+                ??
+                _targetTypes.FirstOrDefault(
+                    lt => lt.TargetType.Name.StartsWith(typeName, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
