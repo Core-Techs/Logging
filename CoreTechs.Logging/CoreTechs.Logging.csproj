@@ -37,25 +37,26 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IConfigurableTarget.cs" />
+    <Compile Include="IConfigurable.cs" />
+    <Compile Include="LoggingInterval.cs" />
     <Compile Include="ReaderWriterLockMgr.cs" />
     <Compile Include="DefaultExceptionFormatter.cs" />
     <Compile Include="DefaultSmtpClientCreator.cs" />
     <Compile Include="ICreateSmtpClient.cs" />
-    <Compile Include="Targets\EventLogLogger.cs" />
-    <Compile Include="Targets\MemoryTarget.cs" />
-    <Compile Include="Targets\PeriodicEmailTarget.cs" />
-    <Compile Include="Targets\DefaultEmailSubjectFormatter.cs" />
     <Compile Include="Targets\EmailTarget.cs" />
-    <Compile Include="Targets\PeriodicTarget.cs" />
+    <Compile Include="Targets\EventLogLogger.cs" />
     <Compile Include="Targets\FileTarget.cs" />
+    <Compile Include="Targets\IFlushable.cs" />
+    <Compile Include="Targets\LogEntryBuffer.cs" />
+    <Compile Include="Targets\MemoryTarget.cs" />
+    <Compile Include="DefaultEmailSubjectFormatter.cs" />
     <Compile Include="IFormatException.cs" />
-    <Compile Include="Targets\PeriodicFileTarget.cs" />
     <Compile Include="Targets\TraceTarget.cs" />
+    <Compile Include="UnitOfTime.cs" />
     <Compile Include="Try.cs" />
     <Compile Include="Configuration\ConfigSection.cs" />
     <Compile Include="Configuration\TargetConstructor.cs" />
-    <Compile Include="Configuration\FriendlyTypeNameAttribute.cs" />
+    <Compile Include="Configuration\AliasTypeNameAttribute.cs" />
     <Compile Include="Configuration\LoggingConfigurationException.cs" />
     <Compile Include="Configuration\TargetConstructionException.cs" />
     <Compile Include="Configuration\TargetTypeInfo.cs" />

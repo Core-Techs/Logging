@@ -70,7 +70,7 @@ namespace CoreTechs.Logging.Targets
             if (!maxlevel.IsNullOrWhitespace())
                 MaxLevel = Enums.Parse<Level>(maxlevel);
 
-            var configurable = this as IConfigurableTarget;
+            var configurable = this as IConfigurable;
             if (configurable != null)
                 configurable.Configure(xml);
         }

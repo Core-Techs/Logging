@@ -67,7 +67,7 @@ namespace CoreTechs.Logging.Configuration
                 _targetTypes.FirstOrDefault(
                     lt =>
                     lt.FriendlyTypeNameAttribute != null &&
-                    lt.FriendlyTypeNameAttribute.FriendlyTypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase))
+                    lt.FriendlyTypeNameAttribute.Alias.Equals(typeName, StringComparison.OrdinalIgnoreCase))
 
                 // search by name
                 ??

@@ -24,15 +24,15 @@ namespace CoreTechs.Logging
         public static T ConstructOrDefault<T>(this Type type)
         {
             if (type == null) return default(T);
-            return (T) Activator.CreateInstance(type);
+            return (T)Activator.CreateInstance(type);
         }
 
         public static IEnumerable<Type> Search(this IEnumerable<Type> types, string name,
-            StringComparison stringComparison  = StringComparison.OrdinalIgnoreCase)
+            StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
         {
             return from t in types
-                where t.FullName.Equals(name, stringComparison) || t.Name.Equals(name, stringComparison)
-                select t;
+                   where t.FullName.Equals(name, stringComparison) || t.Name.Equals(name, stringComparison)
+                   select t;
         }
 
         static IEnumerable<Assembly> GetAssemblies()
@@ -40,6 +40,9 @@ namespace CoreTechs.Logging
             return AppDomain.CurrentDomain.GetAssemblies().Where(a => Try.Do(() => a.GetTypes()).Success);
         }
 
-        
+        public static T Construct<T>(string typeName, IEnumerable<Assembly> assemblies = null)
+        {
+            return All(assemblies).Search(typeName).First().ConstructOrDefault<T>();
+        }
     }
 }

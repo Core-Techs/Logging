@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace CoreTechs.Logging.Targets
 {
-    public class MemoryTarget : Target, IConfigurableTarget
+    public class MemoryTarget : Target, IConfigurable
     {
         private readonly Queue<LogEntry> _entries = new Queue<LogEntry>();
 

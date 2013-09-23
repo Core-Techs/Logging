@@ -1,4 +1,4 @@
-﻿namespace CoreTechs.Logging.Targets
+﻿namespace CoreTechs.Logging
 {
     internal class DefaultEmailSubjectFormatter : IEntryConverter<string>
     {

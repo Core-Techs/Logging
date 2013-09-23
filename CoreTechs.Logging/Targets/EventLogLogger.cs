@@ -4,8 +4,8 @@ using CoreTechs.Logging.Configuration;
 
 namespace CoreTechs.Logging.Targets
 {
-    [FriendlyTypeName("EventLog")]
-    public class EventLogTarget : Target, IConfigurableTarget
+    [AliasTypeName("EventLog")]
+    public class EventLogTarget : Target, IConfigurable
     {
         /// <summary>
         /// The windows event log entry source.

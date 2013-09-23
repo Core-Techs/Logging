@@ -2,7 +2,7 @@ using System.Xml.Linq;
 
 namespace CoreTechs.Logging
 {
-    interface IConfigurableTarget
+    public interface IConfigurable
     {
         void Configure(XElement xml);
     }

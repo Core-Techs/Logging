@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml.Linq;
 using JetBrains.Annotations;
 
 namespace CoreTechs.Logging.Targets

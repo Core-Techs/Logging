@@ -4,8 +4,8 @@ using CoreTechs.Logging.Configuration;
 
 namespace CoreTechs.Logging.Targets
 {
-    [FriendlyTypeName("ColoredConsole")]
-    public class ColoredConsoleTarget : ConsoleTarget, IConfigurableTarget
+    [AliasTypeName("ColoredConsole")]
+    public class ColoredConsoleTarget : ConsoleTarget, IConfigurable
     {
         const ConsoleColor DefaultTraceColor = ConsoleColor.DarkGray;
         const ConsoleColor DefaultDebugColor = ConsoleColor.Gray;
@@ -67,7 +67,7 @@ namespace CoreTechs.Logging.Targets
             Console.ForegroundColor = color;
         }
 
-        public  void Configure(XElement xml)
+        public new void Configure(XElement xml)
         {
             base.Configure(xml);
 

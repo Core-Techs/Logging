@@ -29,6 +29,11 @@ namespace CoreTechs.Logging
         public static LogManager Configure(string configSectionName)
         {
             var xml = (XElement) ConfigurationManager.GetSection(configSectionName);
+
+            // log manager is built here instead of the ConfigSection class
+            // because ConfigurationManager caches the instances returned from GetSection()
+            // better to cache the xml than the log manager
+
             var targets = xml.Descendants("target", StringComparison.OrdinalIgnoreCase);
             var dlc = new TargetConstructor();
             return new LogManager
@@ -74,6 +79,9 @@ namespace CoreTechs.Logging
         {
             _logEntries.CompleteAdding();
             _writer.Wait();
+
+            foreach (var target in Targets.OfType<IFlushable>())
+                target.Flush();
         }
 
         private void WriteQueuedEntries()

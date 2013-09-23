@@ -4,8 +4,8 @@ using CoreTechs.Logging.Configuration;
 
 namespace CoreTechs.Logging.Targets
 {
-    [FriendlyTypeName("Console")]
-    public class ConsoleTarget : Target, IConfigurableTarget
+    [AliasTypeName("Console")]
+    public class ConsoleTarget : Target, IConfigurable
     {
         public IEntryConverter<string> EntryFormatter { get; set; }
 

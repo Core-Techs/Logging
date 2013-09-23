@@ -4,8 +4,8 @@ using CoreTechs.Logging.Configuration;
 
 namespace CoreTechs.Logging.Targets
 {
-    [FriendlyTypeName("Trace")]
-    public class TraceTarget : Target,IConfigurableTarget
+    [AliasTypeName("Trace")]
+    public class TraceTarget : Target, IConfigurable
     {
         public IEntryConverter<string> EntryFormatter { get; set; }
 
