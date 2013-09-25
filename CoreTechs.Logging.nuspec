@@ -12,13 +12,10 @@
         <releaseNotes />
         <copyright>Copyright Core Techs 2013</copyright>
         <tags>logging log logger</tags>
-        <dependencies>
-            <dependency id="Newtonsoft.Json" version="4.5.11" />
-            <dependency id="fasterflect" version="2.1.3" />
-        </dependencies>
+        <dependencies />
     </metadata>
     <files>
-        <file src="CoreTechs.Logging\bin\Release\CoreTechs.Logging.dll" target="lib\net40-client\CoreTechs.Logging.dll" />
-        <file src="CoreTechs.Logging\bin\Release\CoreTechs.Logging.pdb" target="lib\net40-client\CoreTechs.Logging.pdb" />
+        <file src="lib\net40-client\CoreTechs.Logging.dll" target="lib\net40-client\CoreTechs.Logging.dll" />
+        <file src="lib\net40-client\CoreTechs.Logging.pdb" target="lib\net40-client\CoreTechs.Logging.pdb" />
     </files>
 </package>
