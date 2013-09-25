@@ -29,47 +29,42 @@ namespace CoreTechs.Logging
         [StringFormatMethod(FormatParameterName)]
         public void Trace(string message = null, params object[] args)
         {
-            new LogEntryBuilder(this).Message(message, args).Trace();
+            new LogEntryBuilder(this).Trace(message, args);
         }
 
         [StringFormatMethod(FormatParameterName)]
         public void Debug(string message = null, params object[] args)
         {
-            new LogEntryBuilder(this).Message(message, args).Debug();
+            new LogEntryBuilder(this).Debug(message, args);
         }
 
         [StringFormatMethod(FormatParameterName)]
         public void Info(string message = null, params object[] args)
         {
-            new LogEntryBuilder(this).Message(message, args).Info();
+            new LogEntryBuilder(this).Info(message, args);
         }
 
         [StringFormatMethod(FormatParameterName)]
         public void Warn(string message = null, params object[] args)
         {
-            new LogEntryBuilder(this).Message(message, args).Warn();
+            new LogEntryBuilder(this).Warn(message, args);
         }
 
         [StringFormatMethod(FormatParameterName)]
         public void Error(string message = null, params object[] args)
         {
-            new LogEntryBuilder(this).Message(message, args).Error();
+            new LogEntryBuilder(this).Error(message, args);
         }
 
         [StringFormatMethod(FormatParameterName)]
         public void Fatal(string message = null, params object[] args)
         {
-            new LogEntryBuilder(this).Message(message, args).Fatal();
+            new LogEntryBuilder(this).Fatal(message, args);
         }
 
         public LogEntryBuilder Exception(Exception exception)
         {
             return new LogEntryBuilder(this).Exception(exception);
-        }
-
-        public LogEntryBuilder Message(string message, params object[] args)
-        {
-            return new LogEntryBuilder(this).Message(message, args);
         }
 
         public LogEntryBuilder Data(IEnumerable<KeyValuePair<string, object>> data)

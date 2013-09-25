@@ -7,6 +7,7 @@ namespace CoreTechs.Logging
 {
     public class LogEntryBuilder
     {
+        private const string FormatParameterName = "message";
         private readonly Logger _logger;
 
         public LogEntryBuilder([NotNull] Logger logger)
@@ -32,56 +33,54 @@ namespace CoreTechs.Logging
 
             return this;
         }
-
+        
         public LogEntryBuilder Exception(Exception exception)
         {
             Entry.Exception = exception;
             return this;
         }
 
-        [StringFormatMethod("message")]
-        public LogEntryBuilder Message(string message, params object[] args)
-        {
-            Entry.MessageFormat = message;
-            Entry.MessageArgs = args;
-            return this;
-        }
-
-        public void Level(Lvl level)
+        [StringFormatMethod(FormatParameterName)]
+        public void Level(Lvl level, string message = null, params object[] args)
         {
             Entry.Level = level;
             _logger.Write(Entry);
         }
 
-
-        public void Trace()
+        [StringFormatMethod(FormatParameterName)]
+        public void Trace(string message = null, params object[] args)
         {
-             Level(Lvl.Trace);
+            Level(Lvl.Trace, message, args);
         }
 
-        public void Debug()
+        [StringFormatMethod(FormatParameterName)]
+        public void Debug(string message = null, params object[] args)
         {
-             Level(Lvl.Debug);
+            Level(Lvl.Debug, message, args);
         }
 
-        public void Info()
+        [StringFormatMethod(FormatParameterName)]
+        public void Info(string message = null, params object[] args)
         {
-             Level(Lvl.Info);
+            Level(Lvl.Info, message, args);
         }
 
-        public void Warn()
+        [StringFormatMethod(FormatParameterName)]
+        public void Warn(string message = null, params object[] args)
         {
-             Level(Lvl.Warn);
+            Level(Lvl.Warn, message, args);
         }
 
-        public void Error()
+        [StringFormatMethod(FormatParameterName)]
+        public void Error(string message = null, params object[] args)
         {
-             Level(Lvl.Error);
+            Level(Lvl.Error, message, args);
         }
 
-        public void Fatal()
+        [StringFormatMethod(FormatParameterName)]
+        public void Fatal(string message = null, params object[] args)
         {
-            Level(Lvl.Fatal);
+            Level(Lvl.Fatal, message, args);
         }
     }
 }
