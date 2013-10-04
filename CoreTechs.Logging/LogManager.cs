@@ -96,7 +96,7 @@ namespace CoreTechs.Logging
                     }
                     catch (Exception ex)
                     {
-                        OnUnhandledLoggingException(ex);
+                        Try.Do(() => OnUnhandledLoggingException(ex));
                     }
                 }
             }

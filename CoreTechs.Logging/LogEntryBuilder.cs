@@ -44,6 +44,8 @@ namespace CoreTechs.Logging
         public void Level(Lvl level, string message = null, params object[] args)
         {
             Entry.Level = level;
+            Entry.MessageFormat = message;
+            Entry.MessageArgs = args;
             _logger.Write(Entry);
         }
 

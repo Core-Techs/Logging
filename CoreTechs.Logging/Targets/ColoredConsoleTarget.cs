@@ -71,15 +71,15 @@ namespace CoreTechs.Logging.Targets
         {
             base.Configure(xml);
 
-            Func<string, ConsoleColor> getColor =
-                x => Try.Get(() => Enums.Parse<ConsoleColor>(xml.GetAttributeValue(x))).Value;
+            Func<string, ConsoleColor, ConsoleColor> getColor =
+                (str, def) => Try.Get(() => Enums.Parse<ConsoleColor>(xml.GetAttributeValue(str)), def).Value;
 
-            TraceColor = getColor("TraceColor");
-            DebugColor = getColor("DebugColor");
-            InfoColor = getColor("InfoColor");
-            WarnColor = getColor("WarnColor");
-            ErrorColor = getColor("ErrorColor");
-            FatalColor = getColor("FatalColor");
+            TraceColor = getColor("TraceColor",DefaultTraceColor);
+            DebugColor = getColor("DebugColor",DefaultDebugColor);
+            InfoColor = getColor("InfoColor", DefaultInfoColor);
+            WarnColor = getColor("WarnColor", DefaultWarnColor);
+            ErrorColor = getColor("ErrorColor", DefaultErrorColor);
+            FatalColor = getColor("FatalColor", DefaultFatalColor);
         }
     }
 }

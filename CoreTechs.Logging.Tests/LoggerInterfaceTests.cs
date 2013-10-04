@@ -7,6 +7,38 @@ namespace CoreTechs.Logging.Tests
 {
     internal class LoggerInterfaceTests
     {
+        private static readonly Logger Log = LogManager.Global.CreateLogger();
+
+        public void sample()
+        {
+            var console = new ConsoleTarget();
+            LogManager.Global = new LogManager(new[] {console});
+
+            Log.Trace("A small detail");
+            Log.Debug("Something {0} is going on.", "fishy");
+            Log.Data("Username", "roverby")
+                .Data("Email", "roverby@core-techs.net")
+                .Info("A user has logged into the system.");
+
+            if (TooManyIncorrectLoginAttempts)
+                Log.Data("Username", username)
+                    .Warn("A user may be trying to break into the system.");
+
+            try
+            {
+                SomethingDangerous();
+            }
+            catch (TolerableException ex)
+            {
+                Log.Exception(ex).Error();
+            }
+            catch (Exception ex)
+            {
+                Log.Exception(ex).Fatal();
+                throw;
+            }
+        }
+
         [Test]
         public void eventvwr()
         {
@@ -53,10 +85,10 @@ namespace CoreTechs.Logging.Tests
             var fileTarget = new FileTarget();
             var mgr = new LogManager(new[] {fileTarget});
 
-            fileTarget.Configure(XElement.Parse(@"<target path=""c:\logs"" interval=""1 minute"" archivecount=""2"" />"));
+            fileTarget.Configure(XElement.Parse(@"<target path=""C:\Users\roverby\Desktop\logtest"" interval=""5 second"" archivecount=""2"" />"));
 
             Assert.AreEqual(2, fileTarget.ArchiveCount);
-            Assert.AreEqual(TimeSpan.FromMinutes(1), fileTarget.Interval.Duration);
+            Assert.AreEqual(TimeSpan.FromSeconds(5), fileTarget.Interval.Duration);
 
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
             var log = mgr.CreateLogger();
@@ -64,6 +96,28 @@ namespace CoreTechs.Logging.Tests
             {
                 log.Info("test");
                 log.Warn("YIKE!"); 
+            }
+            
+            mgr.WaitAllWritesComplete();
+        }
+
+        [Test]
+        public void LogToFile()
+        {
+            var fileTarget = new FileTarget
+            {
+                Path = @"C:\Users\roverby\Desktop\logtest",
+                Interval= LoggingInterval.Parse("5 second"),
+                ArchiveCount= 3
+            };
+            var mgr = new LogManager(new[] {fileTarget});
+            mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
+            var log = mgr.CreateLogger();
+
+            for (var i = 0; i < 99999; i++)
+            {
+                log.Info("test");
+                log.Warn("YIKE!");
             }
             
             mgr.WaitAllWritesComplete();
@@ -107,7 +161,6 @@ namespace CoreTechs.Logging.Tests
             mgr.WaitAllWritesComplete();
 
             Console.WriteLine(memoryTarget.View());
-
         }
     }
 }

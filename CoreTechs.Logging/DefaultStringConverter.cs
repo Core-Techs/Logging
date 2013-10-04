@@ -7,6 +7,15 @@ namespace CoreTechs.Logging
 {
     public class DefaultStringConverter : IEntryConverter<string>
     {
+        public bool OmitHeading { get; set; }
+        public bool Indent { get; set; }
+
+        public DefaultStringConverter()
+        {
+            OmitHeading = false;
+            Indent = true;
+        }
+
         private IFormatException _exceptionFormatter;
         public IFormatException ExceptionFormatter
         {
@@ -19,12 +28,15 @@ namespace CoreTechs.Logging
             if (entry == null) throw new ArgumentNullException("entry");
 
             // entry heading
-            var sb = new StringBuilder().AppendFormat("{0} : {1} : {2}", entry.Source, entry.Level, entry.Created)
-                                        .AppendLine();
+            var sb = new StringBuilder();
+
+            if (!OmitHeading)
+                sb.AppendFormat("{0} : {1} : {2}", entry.Source, entry.Level, entry.Created).AppendLine();
+
             using (var sw = new StringWriter(sb))
             using (var iw = new IndentedTextWriter(sw))
             {
-                iw.Indent++;
+                if (Indent) iw.Indent++;
 
                 // entry message
                 var msg = entry.GetMessage();
