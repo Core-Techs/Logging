@@ -11,11 +11,15 @@ namespace CoreTechs.Logging.Targets
     [AliasTypeName("Email")]
     public class EmailTarget : Target, IConfigurable, IFlushable
     {
-        private string _tempFile = Path.GetTempFileName();
-
-        private ICreateSmtpClient _smtpClientFactory;
-        private LoggingInterval _interval;
         private readonly ReaderWriterLockSlim _tempFileLock = new ReaderWriterLockSlim();
+        private LoggingInterval _interval;
+        private ICreateSmtpClient _smtpClientFactory;
+        private string _tempFile;
+
+        public EmailTarget()
+        {
+            _tempFile = GetTempFilePath();
+        }
 
         public ICreateSmtpClient SmtpClientFactory
         {
@@ -47,6 +51,29 @@ namespace CoreTechs.Logging.Targets
             }
         }
 
+        public void Configure(XElement xml)
+        {
+            From = xml.GetAttributeValue("from");
+            To = xml.GetAttributeValue("to");
+            Subject = xml.GetAttributeValue("subject");
+
+            SmtpClientFactory = ConstructOrDefault<ICreateSmtpClient>(xml.GetAttributeValue("SmtpClientFactory"));
+            BodyFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("BodyFormatter"));
+            SubjectFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("SubjectFormatter"));
+
+            Interval = Try.Get(() => LoggingInterval.Parse(xml.GetAttributeValue("interval"))).Value;
+        }
+
+        public void Flush()
+        {
+            SendBuffer();
+        }
+
+        private string GetTempFilePath()
+        {
+            return Path.Combine(Path.GetTempPath(), GetType().FullName, Guid.NewGuid().ToString("n") + ".txt");
+        }
+
         private void OnIntervalEnding(object sender, EventArgs eventArgs)
         {
             SendBuffer();
@@ -60,15 +87,15 @@ namespace CoreTechs.Logging.Targets
             {
                 lockmgr.EnterWriteLock();
                 oldFile = _tempFile;
-                _tempFile = Path.GetTempFileName();
+                _tempFile = GetTempFilePath();
             }
 
             // email file
             var file = new FileInfo(oldFile);
             if (file.Exists && file.Length > 0)
             {
-                var subj = Subject ?? string.Format("{0} Log Entries", AppDomain.CurrentDomain.FriendlyName);
-                var body = File.ReadAllText(oldFile);
+                string subj = Subject ?? string.Format("{0} Log Entries", AppDomain.CurrentDomain.FriendlyName);
+                string body = File.ReadAllText(oldFile);
                 Send(subj, body);
 
                 // delete file
@@ -94,29 +121,29 @@ namespace CoreTechs.Logging.Targets
             {
                 lockmgr.EnterReadLock();
 
-                var body = GetBody(entry);
+                string body = GetBody(entry);
                 File.AppendAllText(_tempFile, body);
             }
         }
 
         public void SendEntry(LogEntry entry)
         {
-            var fmt = SubjectFormatter ?? new DefaultEmailSubjectFormatter();
-            var subj = Subject ?? fmt.Convert(entry);
-            var body = GetBody(entry);
+            IEntryConverter<string> fmt = SubjectFormatter ?? new DefaultEmailSubjectFormatter();
+            string subj = Subject ?? fmt.Convert(entry);
+            string body = GetBody(entry);
             Send(subj, body);
         }
 
         private string GetBody(LogEntry entry)
         {
-            var fmt = BodyFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
-            var body = fmt.Convert(entry);
+            IEntryConverter<string> fmt = BodyFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
+            string body = fmt.Convert(entry);
             return body;
         }
 
         public void Send(string subject, string body)
         {
-            using (var smtp = SmtpClientFactory.CreateSmtpClient())
+            using (SmtpClient smtp = SmtpClientFactory.CreateSmtpClient())
             using (var mail = new MailMessage())
             {
                 mail.To.Add(To);
@@ -129,24 +156,6 @@ namespace CoreTechs.Logging.Targets
 
                 smtp.Send(mail);
             }
-        }
-
-        public void Configure(XElement xml)
-        {
-            From = xml.GetAttributeValue("from");
-            To = xml.GetAttributeValue("to");
-            Subject = xml.GetAttributeValue("subject");
-
-            SmtpClientFactory = ConstructOrDefault<ICreateSmtpClient>(xml.GetAttributeValue("SmtpClientFactory"));
-            BodyFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("BodyFormatter"));
-            SubjectFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("SubjectFormatter"));
-
-            Interval = Try.Get(() => LoggingInterval.Parse(xml.GetAttributeValue("interval"))).Value;
-        }
-
-        public void Flush()
-        {
-            SendBuffer();
         }
     }
 }

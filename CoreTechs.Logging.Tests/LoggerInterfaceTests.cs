@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml.Linq;
+using CoreTechs.Logging.Configuration;
 using CoreTechs.Logging.Targets;
 using NUnit.Framework;
 
@@ -7,36 +8,29 @@ namespace CoreTechs.Logging.Tests
 {
     internal class LoggerInterfaceTests
     {
-        private static readonly Logger Log = LogManager.Global.CreateLogger();
+        private static readonly Logger Log;
 
-        public void sample()
+
+        static LoggerInterfaceTests()
         {
-            var console = new ConsoleTarget();
-            LogManager.Global = new LogManager(new[] {console});
+            LogManager.Global = LogManager.Configure("logging");
+            Log= LogManager.Global.CreateLogger();
+        }
+       
 
-            Log.Trace("A small detail");
-            Log.Debug("Something {0} is going on.", "fishy");
-            Log.Data("Username", "roverby")
-                .Data("Email", "roverby@core-techs.net")
-                .Info("A user has logged into the system.");
+        [Test]
+        public void WhatsWRongWithThisCOnfig()
+        {
+            const string config = "<target type=\"Email\" interval=\"1 minute\"\r\n                  From=\"logging@core-te" +
+                                  "chs.net\" To=\"afssupport@core-techs.net\" \r\n                  Subject=\"PCSi Servic" +
+                                  "e Logging\" MinLevel=\"Warn\" />  ";
 
-            if (TooManyIncorrectLoginAttempts)
-                Log.Data("Username", username)
-                    .Warn("A user may be trying to break into the system.");
 
-            try
-            {
-                SomethingDangerous();
-            }
-            catch (TolerableException ex)
-            {
-                Log.Exception(ex).Error();
-            }
-            catch (Exception ex)
-            {
-                Log.Exception(ex).Fatal();
-                throw;
-            }
+            var xml = XElement.Parse(config);
+
+
+            var t = new TargetConstructor().Construct(xml);
+
         }
 
         [Test]
