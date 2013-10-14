@@ -71,7 +71,12 @@ namespace CoreTechs.Logging.Targets
 
         private string GetTempFilePath()
         {
-            return Path.Combine(Path.GetTempPath(), GetType().FullName, Guid.NewGuid().ToString("n") + ".txt");
+            var path = 
+             Path.Combine(Path.GetTempPath(), GetType().FullName, Guid.NewGuid().ToString("n") + ".txt");
+
+            var file = new FileInfo(path);
+            if (file.Directory != null && !file.Directory.Exists) file.Directory.Create();
+            return file.FullName;
         }
 
         private void OnIntervalEnding(object sender, EventArgs eventArgs)
@@ -103,6 +108,7 @@ namespace CoreTechs.Logging.Targets
             }
 
             // prepare for next period
+            if (Interval == null) return;
             Interval.Update();
             Interval.StartTimer();
         }

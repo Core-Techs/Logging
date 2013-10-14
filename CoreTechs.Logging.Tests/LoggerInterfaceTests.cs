@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Xml.Linq;
 using CoreTechs.Logging.Configuration;
 using CoreTechs.Logging.Targets;
@@ -21,15 +22,22 @@ namespace CoreTechs.Logging.Tests
         [Test]
         public void WhatsWRongWithThisCOnfig()
         {
-            const string config = "<target type=\"Email\" interval=\"1 minute\"\r\n                  From=\"logging@core-te" +
-                                  "chs.net\" To=\"afssupport@core-techs.net\" \r\n                  Subject=\"PCSi Servic" +
-                                  "e Logging\" MinLevel=\"Warn\" />  ";
+            var mgr = new LogManager();
+            var mail =
+                new EmailTarget
+                {
+                    To = "roverby@core-techs.net",
+                    Subject = "WTF",
+                    //Interval = LoggingInterval.Parse("1 minute")
+                };
 
+            mgr.Targets.Add(mail);
 
-            var xml = XElement.Parse(config);
+            var log = mgr.CreateLogger();
 
-
-            var t = new TargetConstructor().Construct(xml);
+            log.Info("test");
+            Thread.Sleep(1000);
+            mgr.WaitAllWritesComplete();	
 
         }
 

@@ -41,7 +41,7 @@ namespace CoreTechs.Logging
             return element.Descendants().Where(x => name.Equals(x.Name.ToString(), stringComparison));
         }
 
-        public static DateTimeOffset LastInstanceAsOf(this TimeSpan timeSpan, DateTimeOffset dt)
+        internal static DateTimeOffset LastInstanceAsOf(this TimeSpan timeSpan, DateTimeOffset dt)
         {
             var epoch = new DateTimeOffset(new DateTime(1, 1, 1));
             var periodsPassed = (dt - epoch).Ticks / timeSpan.Ticks;
@@ -49,17 +49,17 @@ namespace CoreTechs.Logging
             return periodBegin;
         }
 
-        public static DateTimeOffset LastInstanceAsOfNow(this TimeSpan timeSpan)
+        internal static DateTimeOffset LastInstanceAsOfNow(this TimeSpan timeSpan)
         {
             return timeSpan.LastInstanceAsOf(DateTimeOffset.Now);
         }
 
-        public static TimeSpan Multiply(this TimeSpan duration, int times)
+        internal static TimeSpan Multiply(this TimeSpan duration, int times)
         {
             return new TimeSpan(duration.Ticks * times);
         }
 
-        public static FileInfo File(this DirectoryInfo dir, string filename)
+        internal static FileInfo File(this DirectoryInfo dir, string filename)
         {
             var path = Path.Combine(dir.FullName, filename);
             return new FileInfo(path);
