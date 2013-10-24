@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IConfigurable.cs" />
+    <Compile Include="ILogDataSource.cs" />
     <Compile Include="LoggingInterval.cs" />
     <Compile Include="ReaderWriterLockMgr.cs" />
     <Compile Include="DefaultExceptionFormatter.cs" />

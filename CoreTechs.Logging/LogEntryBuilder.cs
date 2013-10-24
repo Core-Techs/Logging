@@ -20,6 +20,11 @@ namespace CoreTechs.Logging
 
         public LogEntry Entry { get; internal set; }
 
+        public LogEntryBuilder Data(ILogDataSource dataSource)
+        {
+            return Data(dataSource.GetLogData());
+        }
+
         public LogEntryBuilder Data(string key, object value)
         {
             Entry.Data[key] = value;
