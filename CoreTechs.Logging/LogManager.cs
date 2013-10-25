@@ -11,7 +11,7 @@ using CoreTechs.Logging.Targets;
 
 namespace CoreTechs.Logging
 {
-    public class LogManager
+    public class LogManager : IDisposable
     {
         private readonly BlockingCollection<LogEntry> _logEntries;
         private readonly Task _writer;
@@ -28,7 +28,7 @@ namespace CoreTechs.Logging
 
         public static LogManager Configure(string configSectionName)
         {
-            var xml = (XElement) ConfigurationManager.GetSection(configSectionName);
+            var xml = (XElement)ConfigurationManager.GetSection(configSectionName);
 
             // log manager is built here instead of the ConfigSection class
             // because ConfigurationManager caches the instances returned from GetSection()
@@ -82,6 +82,9 @@ namespace CoreTechs.Logging
 
             foreach (var target in Targets.OfType<IFlushable>())
                 target.Flush();
+
+            foreach (var target in Targets.OfType<IDisposable>())
+                target.Dispose();
         }
 
         private void WriteQueuedEntries()
@@ -139,6 +142,11 @@ namespace CoreTechs.Logging
             {
                 OnUnhandledLoggingException(ex);
             }
+        }
+
+        public void Dispose()
+        {
+            WaitAllWritesComplete();
         }
     }
 }

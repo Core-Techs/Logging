@@ -14,11 +14,11 @@ namespace CoreTechs.Logging.Targets
         private readonly ReaderWriterLockSlim _tempFileLock = new ReaderWriterLockSlim();
         private LoggingInterval _interval;
         private ICreateSmtpClient _smtpClientFactory;
-        private string _tempFile;
+        private LogFile _tempFile;
 
         public EmailTarget()
         {
-            _tempFile = GetTempFilePath();
+            _tempFile = GetTempFile();
         }
 
         public ICreateSmtpClient SmtpClientFactory
@@ -69,14 +69,12 @@ namespace CoreTechs.Logging.Targets
             SendBuffer();
         }
 
-        private string GetTempFilePath()
+        private LogFile GetTempFile()
         {
-            var path = 
-             Path.Combine(Path.GetTempPath(), GetType().FullName, Guid.NewGuid().ToString("n") + ".txt");
-
+            var path = Path.Combine(Path.GetTempPath(), GetType().FullName, Guid.NewGuid().ToString("n") + ".txt");
             var file = new FileInfo(path);
             if (file.Directory != null && !file.Directory.Exists) file.Directory.Create();
-            return file.FullName;
+            return new LogFile(file) {DeleteOnDispose = true};
         }
 
         private void OnIntervalEnding(object sender, EventArgs eventArgs)
@@ -87,30 +85,29 @@ namespace CoreTechs.Logging.Targets
         private void SendBuffer()
         {
             // start logging to a new file
-            string oldFile;
+            LogFile oldFile;
             using (var lockmgr = new ReaderWriterLockMgr(_tempFileLock))
             {
                 lockmgr.EnterWriteLock();
                 oldFile = _tempFile;
-                _tempFile = GetTempFilePath();
+                _tempFile = GetTempFile();
             }
 
-            // email file
-            var file = new FileInfo(oldFile);
-            if (file.Exists && file.Length > 0)
+            using (oldFile)
             {
-                string subj = Subject ?? string.Format("{0} Log Entries", AppDomain.CurrentDomain.FriendlyName);
-                string body = File.ReadAllText(oldFile);
-                Send(subj, body);
+                // email file
+                if (oldFile.FileInfo.Exists && oldFile.FileInfo.Length > 0)
+                {
+                    var subj = Subject ?? string.Format("{0} Log Entries", AppDomain.CurrentDomain.FriendlyName);
+                    var body = oldFile.ReadAllText(); 
+                    Send(subj, body);
+                }
 
-                // delete file
-                File.Delete(oldFile);
+                // prepare for next period
+                if (Interval == null) return;
+                Interval.Update();
+                Interval.StartTimer();
             }
-
-            // prepare for next period
-            if (Interval == null) return;
-            Interval.Update();
-            Interval.StartTimer();
         }
 
         public override void Write(LogEntry entry)
@@ -126,17 +123,16 @@ namespace CoreTechs.Logging.Targets
             using (var lockmgr = new ReaderWriterLockMgr(_tempFileLock))
             {
                 lockmgr.EnterReadLock();
-
-                string body = GetBody(entry);
-                File.AppendAllText(_tempFile, body);
+                var body = GetBody(entry);
+                _tempFile.Append(body);
             }
         }
 
         public void SendEntry(LogEntry entry)
         {
-            IEntryConverter<string> fmt = SubjectFormatter ?? new DefaultEmailSubjectFormatter();
-            string subj = Subject ?? fmt.Convert(entry);
-            string body = GetBody(entry);
+            var fmt = SubjectFormatter ?? new DefaultEmailSubjectFormatter();
+            var subj = Subject ?? fmt.Convert(entry);
+            var body = GetBody(entry);
             Send(subj, body);
         }
 

@@ -49,6 +49,7 @@
     <Compile Include="Targets\FileTarget.cs" />
     <Compile Include="Targets\IFlushable.cs" />
     <Compile Include="Targets\LogEntryBuffer.cs" />
+    <Compile Include="Targets\LogFile.cs" />
     <Compile Include="Targets\MemoryTarget.cs" />
     <Compile Include="DefaultEmailSubjectFormatter.cs" />
     <Compile Include="IFormatException.cs" />

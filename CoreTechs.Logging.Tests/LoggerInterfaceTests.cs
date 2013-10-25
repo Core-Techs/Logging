@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Xml.Linq;
-using CoreTechs.Logging.Configuration;
 using CoreTechs.Logging.Targets;
 using NUnit.Framework;
 
@@ -63,19 +62,18 @@ namespace CoreTechs.Logging.Tests
         public void BasicEmail()
         {
             var email = new EmailTarget
-                {
-                    From = "logging@example.com",
-                    To = "roverby@core-techs.net",
-                    Interval = LoggingInterval.Parse("1 minute"),
-                    Levels=new []{Level.Warn, }
-                };
+            {
+                From = "logging@example.com",
+                To = "roverby@core-techs.net",
+                Interval = LoggingInterval.Parse("1 second")
+            };
 
             var mgr = new LogManager(new[] {email});
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
 
             var log = mgr.CreateLogger();
 
-            for (var i = 0; i < 1000*1000*10; i++)
+            for (var i = 0; i < 10000; i++)
                 log.Info("test");
 
             mgr.WaitAllWritesComplete();
@@ -97,7 +95,7 @@ namespace CoreTechs.Logging.Tests
             for (var i = 0; i < 99999; i++)
             {
                 log.Info("test");
-                log.Warn("YIKE!"); 
+                log.Warn("YIKE!");
             }
             
             mgr.WaitAllWritesComplete();
@@ -108,15 +106,17 @@ namespace CoreTechs.Logging.Tests
         {
             var fileTarget = new FileTarget
             {
-                Path = @"C:\Users\roverby\Desktop\logtest",
-                Interval= LoggingInterval.Parse("5 second"),
-                ArchiveCount= 3
+                Path = @"C:\Users\roverby\Desktop\log.test.txt",
+                //Interval= LoggingInterval.Parse("5 second"),
+                //ArchiveCount= 3,
+                KeepFileOpen = true
+
             };
             var mgr = new LogManager(new[] {fileTarget});
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
             var log = mgr.CreateLogger();
 
-            for (var i = 0; i < 99999; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 log.Info("test");
                 log.Warn("YIKE!");

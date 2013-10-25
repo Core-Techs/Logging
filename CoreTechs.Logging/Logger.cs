@@ -72,6 +72,11 @@ namespace CoreTechs.Logging
             return new LogEntryBuilder(this).Data(data);
         }
 
+        public LogEntryBuilder Data(ILogDataSource dataSource)
+        {
+            return new LogEntryBuilder(this).Data(dataSource);
+        }
+
         public LogEntryBuilder Data(string key, object value)
         {
             return new LogEntryBuilder(this).Data(key, value);
