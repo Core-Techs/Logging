@@ -85,14 +85,31 @@ namespace CoreTechs.Logging.Tests
             var fileTarget = new FileTarget();
             var mgr = new LogManager(new[] {fileTarget});
 
-            fileTarget.Configure(XElement.Parse(@"<target path=""C:\Users\roverby\Desktop\logtest"" interval=""5 second"" archivecount=""2"" />"));
+            fileTarget.Configure(XElement.Parse(@"<target path=""C:\Users\roverby\Desktop\logtest"" interval=""5 second"" archivecount=""3"" />"));
 
-            Assert.AreEqual(2, fileTarget.ArchiveCount);
+            Assert.AreEqual(3, fileTarget.ArchiveCount);
             Assert.AreEqual(TimeSpan.FromSeconds(5), fileTarget.Interval.Duration);
 
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
             var log = mgr.CreateLogger();
-            for (var i = 0; i < 99999; i++)
+            for (var i = 0; i < 1000*1000; i++)
+            {
+                log.Info("test");
+                log.Warn("YIKE!");
+            }
+            
+            mgr.WaitAllWritesComplete();
+        }
+
+        [Test]
+        public void LogToFileInDirectory()
+        {
+            var fileTarget = new FileTarget {Path = @"C:\Users\roverby\Desktop\mylogz.xxx\"};
+            var mgr = new LogManager(new[] {fileTarget});
+            mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
+            var log = mgr.CreateLogger();
+
+            for (var i = 0; i < 10000; i++)
             {
                 log.Info("test");
                 log.Warn("YIKE!");

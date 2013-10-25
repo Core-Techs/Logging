@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml.Linq;
 using CoreTechs.Logging.Configuration;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace CoreTechs.Logging.Targets
 {
@@ -18,6 +19,27 @@ namespace CoreTechs.Logging.Targets
         public int? ArchiveCount { get; set; }
         public bool KeepFileOpen { get; set; }
 
+        bool IsPathDirectory([NotNull] string path)
+        {
+            if (path == null) throw new ArgumentNullException("path");
+            path = path.Trim();
+
+            if (Directory.Exists(path)) 
+                return true;
+
+            if (File.Exists(path)) 
+                return false;
+
+            // neither file nor directory exists. guess intention
+
+            // if has trailing slash then it's a directory
+            if (new[] {"\\", "/"}.Any(x => path.EndsWith(x)))
+                return true; // ends with slash
+             
+            // has if extension then its a file; directory otherwise
+            return string.IsNullOrWhiteSpace(System.IO.Path.GetExtension(path));
+        }
+
         public FileTarget()
         {
             KeepFileOpen = true;
@@ -25,23 +47,39 @@ namespace CoreTechs.Logging.Targets
 
         public override void Write(LogEntry entry)
         {
-            if (Interval != null)
+            Init();
+
+            if (Interval != null && Interval.Update())
             {
-                Interval.Update();
+                _logFile.Dispose();
                 _logFile = GetNextLogFile();
                 DeleteOldLogFiles();
             }
 
             if (_logFile == null)
             {
-                var di = new DirectoryInfo(Path);
-                _logFile = CreateLogFile(di.Exists ? di.File("log.txt") : new FileInfo(Path));
+                var file = IsPathDirectory(Path) ? new DirectoryInfo(Path).File("log.txt") : new FileInfo(Path);
+                _logFile = CreateLogFile(file);
             }
 
             if (_logFile.FileInfo.Directory != null) _logFile.FileInfo.Directory.Create();
             var fmt = EntryFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
             var msg = fmt.Convert(entry);
             _logFile.Append(msg);
+        }
+
+        private bool _initialized;
+        private void Init()
+        {
+            if (_initialized || Interval == null)
+                return;
+
+            Interval.Update();
+
+            _logFile = GetNextLogFile();
+            DeleteOldLogFiles();
+
+            _initialized = true;
         }
 
         private LogFile GetNextLogFile()

@@ -43,10 +43,20 @@ namespace CoreTechs.Logging
             if (handler != null) handler(this, EventArgs.Empty);
         }
 
-        public void Update()
+        /// <summary>
+        /// Updates the Beginning property based on the current time.
+        /// </summary>
+        /// <returns>True if the interval state chagned; false otherwise.</returns>
+        public bool Update()
         {
+            var updated = false;
             while (DateTimeOffset.Now >= Next)
+            {
                 Beginning = Next;
+                updated = true;
+            }
+
+            return updated;
         }
 
         public static LoggingInterval Parse(string s)
