@@ -3,7 +3,6 @@ using System.IO;
 using System.Xml.Linq;
 using CoreTechs.Logging.Configuration;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace CoreTechs.Logging.Targets
 {
