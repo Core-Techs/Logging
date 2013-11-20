@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CoreTechs.Logging.Configuration;
@@ -75,16 +76,37 @@ namespace CoreTechs.Logging
             set { _targets = value; }
         }
 
-        public void WaitAllWritesComplete()
+        /// <summary>
+        /// Waits for all entries created up to the passed in time to be written and then flushes all targets.
+        /// </summary>
+        /// <param name="dateTime">Log entries created up to this time will be written before returning.</param>
+        public void FlushEntriesAsOf(DateTimeOffset dateTime)
         {
-            _logEntries.CompleteAdding();
-            _writer.Wait();
+            try
+            {
+                while (DateTimeOffset.Now <= dateTime || _logEntries.Any(x => x.Created <= dateTime))
+                    Thread.Sleep(50);
+                
+                FlushTargets();
+            }
+            catch (Exception ex)
+            {
+                OnUnhandledLoggingException(ex);
+            }
+        }
 
+        /// <summary>
+        /// Waits for all entries created up until now to be written and then flushes all targets.
+        /// </summary>
+        public void FlushEntriesAsOfNow()
+        {
+            FlushEntriesAsOf(DateTimeOffset.Now);
+        }
+
+        private void FlushTargets()
+        {
             foreach (var target in Targets.OfType<IFlushable>())
                 target.Flush();
-
-            foreach (var target in Targets.OfType<IDisposable>())
-                target.Dispose();
         }
 
         private void WriteQueuedEntries()
@@ -99,7 +121,7 @@ namespace CoreTechs.Logging
                     }
                     catch (Exception ex)
                     {
-                        Try.Do(() => OnUnhandledLoggingException(ex));
+                        OnUnhandledLoggingException(ex);
                     }
                 }
             }
@@ -144,9 +166,18 @@ namespace CoreTechs.Logging
             }
         }
 
+        /// <summary>
+        /// Waits for all all log entries to be written then flushes and disposes all targets.
+        /// </summary>
         public void Dispose()
         {
-            WaitAllWritesComplete();
+            _logEntries.CompleteAdding();
+            _writer.Wait();
+
+            FlushTargets();
+
+            foreach (var target in Targets.OfType<IDisposable>())
+                target.Dispose();
         }
     }
 }

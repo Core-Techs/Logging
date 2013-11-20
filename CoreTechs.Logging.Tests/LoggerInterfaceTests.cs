@@ -36,7 +36,7 @@ namespace CoreTechs.Logging.Tests
 
             log.Info("test");
             Thread.Sleep(1000);
-            mgr.WaitAllWritesComplete();	
+            mgr.Dispose();	
 
         }
 
@@ -56,7 +56,7 @@ namespace CoreTechs.Logging.Tests
             for (var i = 0; i <  10; i++)
                 log.Info("test");
 
-            mgr.WaitAllWritesComplete();
+            mgr.Dispose();
         }
         [Test]
         public void BasicEmail()
@@ -76,7 +76,7 @@ namespace CoreTechs.Logging.Tests
             for (var i = 0; i < 10000; i++)
                 log.Info("test");
 
-            mgr.WaitAllWritesComplete();
+            mgr.Dispose();
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace CoreTechs.Logging.Tests
                 log.Warn("YIKE!");
             }
             
-            mgr.WaitAllWritesComplete();
+            mgr.Dispose();
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace CoreTechs.Logging.Tests
                 log.Warn("YIKE!");
             }
             
-            mgr.WaitAllWritesComplete();
+            mgr.Dispose();
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace CoreTechs.Logging.Tests
                 log.Warn("YIKE!");
             }
             
-            mgr.WaitAllWritesComplete();
+            mgr.Dispose();
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace CoreTechs.Logging.Tests
             logmgr.UnhandledLoggingException += UnhandledException;
             var log = logmgr.CreateLogger();
             log.Data("good", 123).Info();
-            logmgr.WaitAllWritesComplete();
+            logmgr.Dispose();
         }
 
         private static void UnhandledException(object sender, UnhandledLoggingExceptionEventArgs e)
@@ -164,7 +164,7 @@ namespace CoreTechs.Logging.Tests
             logmgr.UnhandledLoggingException += UnhandledException;
             var log = logmgr.CreateLogger();
             log.Info("test");
-            logmgr.WaitAllWritesComplete();
+            logmgr.Dispose();
         }
 
         [Test]
@@ -177,7 +177,7 @@ namespace CoreTechs.Logging.Tests
             log.Info("Test");
             log.Warn("something bad");
             log.Fatal("ALERT!");
-            mgr.WaitAllWritesComplete();
+            mgr.Dispose();
 
             Console.WriteLine(memoryTarget.View());
         }

@@ -61,7 +61,7 @@ namespace CoreTechs.Logging.Targets
             BodyFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("BodyFormatter"));
             SubjectFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("SubjectFormatter"));
 
-            Interval = Try.Get(() => LoggingInterval.Parse(xml.GetAttributeValue("interval"))).Value;
+            Interval = TryTo.Get(() => LoggingInterval.Parse(xml.GetAttributeValue("interval"))).Value;
         }
 
         public void Flush()

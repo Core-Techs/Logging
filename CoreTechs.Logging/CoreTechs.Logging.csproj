@@ -55,7 +55,7 @@
     <Compile Include="IFormatException.cs" />
     <Compile Include="Targets\TraceTarget.cs" />
     <Compile Include="UnitOfTime.cs" />
-    <Compile Include="Try.cs" />
+    <Compile Include="TryTo.cs" />
     <Compile Include="Configuration\ConfigSection.cs" />
     <Compile Include="Configuration\TargetConstructor.cs" />
     <Compile Include="Configuration\AliasTypeNameAttribute.cs" />

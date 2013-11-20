@@ -32,7 +32,7 @@ namespace CoreTechs.Logging
 
         private void InitTimer()
         {
-            _timer = new Timer(state => OnIntervalEnding());
+            _timer = new Timer(_ => OnIntervalEnding());
         }
 
         public event EventHandler IntervalEnding;
@@ -46,7 +46,7 @@ namespace CoreTechs.Logging
         /// <summary>
         /// Updates the Beginning property based on the current time.
         /// </summary>
-        /// <returns>True if the interval state chagned; false otherwise.</returns>
+        /// <returns>True if the interval state changed; false otherwise.</returns>
         public bool Update()
         {
             var updated = false;
@@ -84,7 +84,12 @@ namespace CoreTechs.Logging
 
         public void StartTimer()
         {
-            _timer.Change(Next - DateTimeOffset.Now, TimeSpan.FromMilliseconds(-1));
+            var dueTime = Next - DateTimeOffset.Now;
+
+            if (dueTime < TimeSpan.Zero)
+                dueTime = TimeSpan.Zero;
+
+            _timer.Change(dueTime, TimeSpan.FromMilliseconds(-1));
         }
     }
 }
