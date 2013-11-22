@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -123,6 +124,9 @@ namespace CoreTechs.Logging
                     {
                         OnUnhandledLoggingException(ex);
                     }
+
+                    if (target.Final)
+                        break;
                 }
             }
         }

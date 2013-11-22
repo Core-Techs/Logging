@@ -31,8 +31,8 @@ namespace CoreTechs.Logging.Targets
 
         public string View()
         {
-            return string.Join(Environment.NewLine,
-                _entries.Select((EntryFormatter ?? new DefaultStringConverter()).Convert));
+            var conv = EntryFormatter ?? new DefaultStringConverter();
+            return string.Join(Environment.NewLine, _entries.Select(conv.Convert));
         }
 
         public void Clear()
@@ -46,7 +46,7 @@ namespace CoreTechs.Logging.Targets
                 ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
 
             var cap = xml.GetAttributeValue("cap") ?? xml.GetAttributeValue("capacity");
-            Capacity = int.Parse(cap);
+            Capacity = TryTo.Get<int?>(() => int.Parse(cap)).Value;
         }
     }
 }

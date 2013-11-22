@@ -9,11 +9,24 @@ namespace CoreTechs.Logging.Targets
 {
     public abstract class Target
     {
-        public string Source { get; set; }
+        private Level[] _levels;
+        private string _source;
+        private Regex _sourceRegex;
+        public bool Final { get; set; }
+
+        public string Source
+        {
+            get { return _source; }
+            set
+            {
+                _source = value;
+                _sourceRegex = null;
+            }
+        }
+
         public Level? MinLevel { get; set; }
         public Level? MaxLevel { get; set; }
 
-        private Regex _sourceRegex;
         private Regex SourceRegex
         {
             get
@@ -29,13 +42,9 @@ namespace CoreTechs.Logging.Targets
             }
         }
 
-        private Level[] _levels;
         public virtual Level[] Levels
         {
-            get
-            {
-                return _levels ?? (_levels = GetLevelsInRange());
-            }
+            get { return _levels ?? (_levels = GetLevelsInRange()); }
             set
             {
                 MinLevel = null;
@@ -59,9 +68,10 @@ namespace CoreTechs.Logging.Targets
             var minlevel = xml.GetAttributeValue("minlevel");
             var maxlevel = xml.GetAttributeValue("maxlevel");
             Source = xml.GetAttributeValue("source");
+            Final = Extensions.ParseBooleanSetting(xml.GetAttributeValue("final", "isfinal"));
 
             if (!levels.IsNullOrWhitespace())
-                Levels = levels.Split(new[] { ',' }).Select(Enums.Parse<Level>).ToArray();
+                Levels = levels.Split(new[] {','}).Select(Enums.Parse<Level>).ToArray();
 
             if (!minlevel.IsNullOrWhitespace())
                 MinLevel = Enums.Parse<Level>(minlevel);
@@ -74,12 +84,13 @@ namespace CoreTechs.Logging.Targets
                 configurable.Configure(xml);
         }
 
-
         internal bool ShouldWriteInternal([NotNull] LogEntry entry)
         {
             if (entry == null) throw new ArgumentNullException("entry");
-            return Levels.Contains(entry.Level)
-                   && (SourceRegex == null || SourceRegex.IsMatch(entry.Source));
+            var hasLevel = Levels.Contains(entry.Level);
+            var matchesSource = SourceRegex == null || SourceRegex.IsMatch(entry.Source);
+            var shouldWrite = hasLevel && matchesSource;
+            return shouldWrite;
         }
 
         protected T ConstructOrDefault<T>([NotNull] string name, IEnumerable<Assembly> assemblies = null)
@@ -91,5 +102,4 @@ namespace CoreTechs.Logging.Targets
                     .ConstructOrDefault<T>()).Value;
         }
     }
-
 }

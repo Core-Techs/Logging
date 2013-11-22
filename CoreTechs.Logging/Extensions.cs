@@ -63,5 +63,12 @@ namespace CoreTechs.Logging
             var path = Path.Combine(dir.FullName, filename);
             return new FileInfo(path);
         }
+
+        internal static bool ParseBooleanSetting(string s)
+        {
+            return
+                TryTo.Get(() => new[] {"yes", "true", "1"}.Any(x => x.Equals(s, StringComparison.OrdinalIgnoreCase)))
+                    .Value;
+        }
     }
 }

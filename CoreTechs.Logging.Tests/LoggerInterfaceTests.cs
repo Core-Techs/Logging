@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using CoreTechs.Logging.Targets;
@@ -8,15 +9,25 @@ namespace CoreTechs.Logging.Tests
 {
     internal class LoggerInterfaceTests
     {
-        private static readonly Logger Log;
+        private static Logger _log;
 
-
-        static LoggerInterfaceTests()
+        [SetUp]
+        public void TestSetup()
         {
-            LogManager.Global = LogManager.Configure("logging");
-            Log= LogManager.Global.CreateLogger();
+            _log = LogManager.Configure("logging").CreateLogger();
+            _log.LogManager.UnhandledLoggingException += (s, e) => { throw e.Exception; };
         }
-       
+
+        [Test]
+        public void CanFinal()
+        {
+            using (_log.LogManager)
+                _log.Info("test");
+
+            var rams = _log.LogManager.Targets.OfType<MemoryTarget>();
+            foreach (var ram in rams)
+                Console.WriteLine(ram.View());
+        }
 
         [Test]
         public void WhatsWRongWithThisCOnfig()
