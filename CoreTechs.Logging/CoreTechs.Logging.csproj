@@ -53,6 +53,7 @@
     <Compile Include="Targets\MemoryTarget.cs" />
     <Compile Include="DefaultEmailSubjectFormatter.cs" />
     <Compile Include="IFormatException.cs" />
+    <Compile Include="Targets\NullTarget.cs" />
     <Compile Include="Targets\TraceTarget.cs" />
     <Compile Include="UnitOfTime.cs" />
     <Compile Include="TryTo.cs" />
