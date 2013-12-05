@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -18,14 +17,15 @@ namespace CoreTechs.Logging
         private readonly BlockingCollection<LogEntry> _logEntries;
         private readonly Task _writer;
         private IDictionary<Type, IEntryConverter> _formatters;
-        private List<Target> _targets;
+        private readonly ConcurrentCollection< Target> _targets = new ConcurrentCollection<Target>();
 
         public LogManager(IEnumerable<Target> targets = null)
         {
             _logEntries = new BlockingCollection<LogEntry>();
             _writer = Task.Factory.StartNew(WriteQueuedEntries);
 
-            if (targets != null) _targets = targets.ToList();
+            if (targets != null)
+                _targets = new ConcurrentCollection<Target>(targets);
         }
 
         public static LogManager Configure(string configSectionName)
@@ -38,10 +38,7 @@ namespace CoreTechs.Logging
 
             var targets = xml.Descendants("target", StringComparison.OrdinalIgnoreCase);
             var dlc = new TargetConstructor();
-            return new LogManager
-                {
-                    Targets = (targets.Select(dlc.Construct)).ToList()
-                };
+            return new LogManager(targets.Select(dlc.Construct));
         }
 
         public Logger CreateLogger<T>()
@@ -71,10 +68,12 @@ namespace CoreTechs.Logging
             set { _formatters = value; }
         }
 
-        public List<Target> Targets
+        public ICollection<Target> Targets
         {
-            get { return _targets ?? (_targets = new List<Target>()); }
-            set { _targets = value; }
+            get
+            {
+                return _targets;
+            }
         }
 
         /// <summary>
@@ -87,7 +86,7 @@ namespace CoreTechs.Logging
             {
                 while (DateTimeOffset.Now <= dateTime || _logEntries.Any(x => x.Created <= dateTime))
                     Thread.Sleep(50);
-                
+
                 FlushTargets();
             }
             catch (Exception ex)
@@ -114,7 +113,9 @@ namespace CoreTechs.Logging
         {
             foreach (var entry in _logEntries.GetConsumingEnumerable())
             {
-                foreach (var target in Targets.Where(t => t.ShouldWriteInternal(entry)))
+                var theEntry = entry;
+
+                foreach (var target in Targets.Where(t => t.ShouldWriteInternal(theEntry)))
                 {
                     try
                     {

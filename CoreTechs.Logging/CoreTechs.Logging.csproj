@@ -37,6 +37,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentCollection.cs" />
     <Compile Include="IConfigurable.cs" />
     <Compile Include="ILogDataSource.cs" />
     <Compile Include="LoggingInterval.cs" />

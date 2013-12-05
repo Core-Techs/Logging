@@ -8,6 +8,15 @@ namespace CoreTechs.Logging
 {
     public static class Extensions
     {
+        internal static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            if (action == null) throw new ArgumentNullException("action");
+
+            foreach (var item in source)
+                action(item);
+        }
+
         internal static bool IsNullOrWhitespace(this string s)
         {
             return String.IsNullOrWhiteSpace(s);
