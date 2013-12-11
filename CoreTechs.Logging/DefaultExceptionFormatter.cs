@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CoreTechs.Logging
 {
-    class DefaultExceptionFormatter : IFormatException
+    class DefaultExceptionFormatter : IFormat<Exception>
     {
         public string Format([NotNull] Exception ex)
         {

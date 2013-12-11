@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace CoreTechs.Logging
@@ -15,8 +18,8 @@ namespace CoreTechs.Logging
             Indent = true;
         }
 
-        private IFormatException _exceptionFormatter;
-        public IFormatException ExceptionFormatter
+        private IFormat<Exception> _exceptionFormatter;
+        public IFormat<Exception> ExceptionFormatter
         {
             get { return _exceptionFormatter ?? (_exceptionFormatter = new DefaultExceptionFormatter()); }
             set { _exceptionFormatter = value; }
@@ -28,7 +31,6 @@ namespace CoreTechs.Logging
 
             // entry heading
             var sb = new StringBuilder();
-
             if (!OmitHeading)
                 sb.AppendFormat("{0} : {1} : {2}", entry.Source, entry.Level, entry.Created).AppendLine();
 
@@ -44,7 +46,19 @@ namespace CoreTechs.Logging
 
                 // entry data
                 foreach (var item in entry.Data)
-                    iw.WriteLine("{0}: {1}", item.Key, item.Value);
+                {
+                    // first line is written along with key
+                    var lines = item.Value.ToString().ReadLines().GetEnumerator().AsEnumerable();
+                    iw.WriteLine(item.Key + ": " + lines.FirstOrDefault());
+
+                    // remaining lines are indented
+                    iw.Indent++;
+                    foreach (var line in lines)
+                    {
+                        iw.WriteLine(line);
+                    }
+                    iw.Indent--;
+                }
 
                 // exception information
                 if (entry.Exception != null)

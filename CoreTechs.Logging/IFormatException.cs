@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace CoreTechs.Logging
+﻿namespace CoreTechs.Logging
 {
-    public interface IFormatException
+    public interface IFormat<in T>
     {
-        string Format(Exception ex);
+        string Format(T value);
     }
 }

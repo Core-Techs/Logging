@@ -8,6 +8,22 @@ namespace CoreTechs.Logging
 {
     public static class Extensions
     {
+        internal static IEnumerable<string> ReadLines(this string s)
+        {
+            string line;
+            using (var sr = new StringReader(s))
+                while ((line = sr.ReadLine()) != null)
+                    yield return line;
+        }
+
+        internal static IEnumerable<T> AsEnumerable<T>(this IEnumerator<T> enumerator)
+        {
+            if (enumerator == null) throw new ArgumentNullException("enumerator");
+
+            while (enumerator.MoveNext())
+                yield return enumerator.Current;
+        }
+
         internal static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
             if (source == null) throw new ArgumentNullException("source");
