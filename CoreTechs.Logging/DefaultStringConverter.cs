@@ -48,7 +48,10 @@ namespace CoreTechs.Logging
                 foreach (var item in entry.Data)
                 {
                     // first line is written along with key
-                    var lines = item.Value.ToString().ReadLines().GetEnumerator().AsEnumerable();
+                    var lines = item.Value == null
+                        ? new[] {"null"}
+                        : item.Value.ToString().ReadLines().GetEnumerator().AsEnumerable();
+
                     iw.WriteLine(item.Key + ": " + lines.FirstOrDefault());
 
                     // remaining lines are indented

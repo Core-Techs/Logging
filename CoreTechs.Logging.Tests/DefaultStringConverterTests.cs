@@ -17,5 +17,15 @@ namespace CoreTechs.Logging.Tests
 
             Console.WriteLine(s);
         }
+
+        [Test]
+        public void CanHandleNullDataValue()
+        {
+            var logManager = new LogManager();
+            var log = logManager.CreateLogger();
+            var lb = log.Data("a", null);
+            var s = new DefaultStringConverter().Convert(lb.Entry);
+            Assert.True(s.Contains("a: null"));
+        }
     }
 }
