@@ -37,7 +37,7 @@ namespace CoreTechs.Logging
 
         static IEnumerable<Assembly> GetAssemblies()
         {
-            return AppDomain.CurrentDomain.GetAssemblies().Where(a => TryTo.Do(() => a.GetTypes()).Succeeded);
+            return AppDomain.CurrentDomain.GetAssemblies().Where(a => Attempt.Do(() => a.GetTypes()).Succeeded);
         }
 
         public static T Construct<T>(string typeName, IEnumerable<Assembly> assemblies = null)

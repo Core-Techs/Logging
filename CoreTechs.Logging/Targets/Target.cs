@@ -95,7 +95,7 @@ namespace CoreTechs.Logging.Targets
 
         protected T ConstructOrDefault<T>([NotNull] string name, IEnumerable<Assembly> assemblies = null)
         {
-            return TryTo.Get(() =>
+            return Attempt.Get(() =>
                 Types.Implementing<T>(assemblies)
                     .Search(name)
                     .FirstOrDefault()

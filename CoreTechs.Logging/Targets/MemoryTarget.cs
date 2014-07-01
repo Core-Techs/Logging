@@ -46,7 +46,7 @@ namespace CoreTechs.Logging.Targets
                 ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
 
             var cap = xml.GetAttributeValue("cap") ?? xml.GetAttributeValue("capacity");
-            Capacity = TryTo.Get<int?>(() => int.Parse(cap)).Value;
+            Capacity = Attempt.Get<int?>(() => int.Parse(cap)).Value;
         }
     }
 }

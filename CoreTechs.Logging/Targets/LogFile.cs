@@ -30,7 +30,7 @@ namespace CoreTechs.Logging.Targets
         public void Dispose()
         {
             CleanupLazyWriter();
-            if (DeleteOnDispose) TryTo.Do(FileInfo.Delete);
+            if (DeleteOnDispose) Attempt.Do(FileInfo.Delete);
         }
 
         private Lazy<StreamWriter> CreateLazyWriter()
@@ -47,7 +47,7 @@ namespace CoreTechs.Logging.Targets
         private void CleanupLazyWriter()
         {
             if (LazyWriter.IsValueCreated)
-                TryTo.Do(LazyWriter.Value.Dispose);
+                Attempt.Do(LazyWriter.Value.Dispose);
 
             _lazyWriter = null;
         }

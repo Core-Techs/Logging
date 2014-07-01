@@ -92,7 +92,7 @@ namespace CoreTechs.Logging
         internal static bool ParseBooleanSetting(string s)
         {
             return
-                TryTo.Get(() => new[] {"yes", "true", "1"}.Any(x => x.Equals(s, StringComparison.OrdinalIgnoreCase)))
+                Attempt.Get(() => new[] {"yes", "true", "1"}.Any(x => x.Equals(s, StringComparison.OrdinalIgnoreCase)))
                     .Value;
         }
     }

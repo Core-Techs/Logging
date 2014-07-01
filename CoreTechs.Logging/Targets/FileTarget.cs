@@ -112,18 +112,18 @@ namespace CoreTechs.Logging.Targets
             var template = new FileTarget(); // used for default values
 
             KeepFileOpen =
-                TryTo.Get(() => bool.Parse(xml.GetAttributeValue("KeepFileOpen", "KeepOpen")), template.KeepFileOpen)
+                Attempt.Get(() => bool.Parse(xml.GetAttributeValue("KeepFileOpen", "KeepOpen")), template.KeepFileOpen)
                     .Value;
 
             Path = xml.GetAttributeValue("path", "file", "folder", "dir", "directory", "filepath");
 
             ArchiveCount =
-                TryTo.Get(() => int.Parse(xml.GetAttributeValue("archivecount")), template.ArchiveCount).Value;
+                Attempt.Get(() => int.Parse(xml.GetAttributeValue("archivecount")), template.ArchiveCount).Value;
 
             EntryFormatter =
                 ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("entryformatter", "formatter"));
 
-            Interval = TryTo.Get(() => LoggingInterval.Parse(xml.GetAttributeValue("interval"))).Value;
+            Interval = Attempt.Get(() => LoggingInterval.Parse(xml.GetAttributeValue("interval"))).Value;
         }
 
         public void Dispose()
