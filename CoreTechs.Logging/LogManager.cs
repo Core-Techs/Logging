@@ -57,11 +57,6 @@ namespace CoreTechs.Logging
             return CreateLogger(type);
         }
 
-        /// <summary>
-        /// Place to store a global instance of the log manager.
-        /// </summary>
-        public static LogManager Global { get; set; }
-
         public IDictionary<Type, IEntryConverter> Formatters
         {
             get { return _formatters ?? (_formatters = GetDefaultConverters()); }
