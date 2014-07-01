@@ -18,7 +18,7 @@ namespace CoreTechs.Logging.Targets
         public int? ArchiveCount { get; set; }
         public bool KeepFileOpen { get; set; }
 
-        bool IsPathDirectory([NotNull] string path)
+        static bool IsPathDirectory([NotNull] string path)
         {
             if (path == null) throw new ArgumentNullException("path");
             path = path.Trim();
@@ -35,7 +35,7 @@ namespace CoreTechs.Logging.Targets
             if (new[] {"\\", "/"}.Any(x => path.EndsWith(x)))
                 return true; // ends with slash
              
-            // has if extension then its a file; directory otherwise
+            // if has extension then its a file; directory otherwise
             return string.IsNullOrWhiteSpace(System.IO.Path.GetExtension(path));
         }
 
