@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -17,7 +18,7 @@ namespace CoreTechs.Logging
         private readonly BlockingCollection<LogEntry> _logEntries;
         private readonly Task _writer;
         private IDictionary<Type, IEntryConverter> _formatters;
-        private readonly ConcurrentCollection< Target> _targets = new ConcurrentCollection<Target>();
+        private readonly ConcurrentCollection<Target> _targets = new ConcurrentCollection<Target>();
 
         public LogManager(IEnumerable<Target> targets = null)
         {
@@ -41,20 +42,42 @@ namespace CoreTechs.Logging
             return new LogManager(targets.Select(dlc.Construct));
         }
 
-        public Logger CreateLogger<T>()
+        public Logger GetLogger(string name)
         {
-            return CreateLogger(typeof(T));
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("name cannot be null or whitespace", "name");
+
+            return new Logger(this, name);
         }
 
-        public Logger CreateLogger(Type type)
+        public Logger GetLogger<T>()
         {
-            return new Logger(this, type.FullName);
+            return GetLogger(typeof(T));
         }
 
-        public Logger CreateLogger()
+        public Logger GetLogger(Type type)
         {
-            var type = new StackTrace().GetFrame(1).GetMethod().DeclaringType;
-            return CreateLogger(type);
+            return GetLogger(type.FullName);
+        }
+
+        public Logger GetLoggerForCallingType()
+        {
+            var method = new StackTrace().GetFrame(1).GetMethod();
+            var type = method.DeclaringType;
+
+            if (type == null)
+                throw new InvalidOperationException("Calling method has no declaring type");
+
+            return GetLogger(type.FullName);
+        }
+
+        public Logger GetLoggerForCallingMethod(bool fullTypeName = true)
+        {
+            var method = new StackTrace().GetFrame(1).GetMethod();
+            var type = method.DeclaringType;
+            if (type == null) throw new InvalidOperationException("declaring type is null");
+            var typeName = fullTypeName ? type.FullName : type.Name;
+            return GetLogger(string.Format("{0}.{1}", typeName, method.Name));
         }
 
         public IDictionary<Type, IEntryConverter> Formatters

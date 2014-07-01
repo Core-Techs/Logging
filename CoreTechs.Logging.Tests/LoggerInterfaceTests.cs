@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Linq;
 using CoreTechs.Logging.Targets;
@@ -14,8 +15,27 @@ namespace CoreTechs.Logging.Tests
         [SetUp]
         public void TestSetup()
         {
-            _log = LogManager.Configure("logging").CreateLogger();
+            _log = LogManager.Configure("logging").GetLoggerForCallingType();
+            var expected = GetType().FullName;
+            Assert.AreEqual(expected, _log.Name);
             _log.LogManager.UnhandledLoggingException += (s, e) => { throw e.Exception; };
+        }
+
+        [Test]
+        public void CanCreateLoggerForMethod()
+        {
+            var myName = GetMyName();
+            var expected = GetType().FullName + "." + myName;
+            Assert.AreEqual(expected,_log.LogManager.GetLoggerForCallingMethod().Name);
+            expected = GetType().Name + "." + myName;
+            Assert.AreEqual(expected,_log.LogManager.GetLoggerForCallingMethod(false).Name);
+          
+
+        }
+
+        private static string GetMyName([CallerMemberName]string name=null)
+        {
+            return name;
         }
 
         [Test]
@@ -43,11 +63,11 @@ namespace CoreTechs.Logging.Tests
 
             mgr.Targets.Add(mail);
 
-            var log = mgr.CreateLogger();
+            var log = mgr.GetLoggerForCallingType();
 
             log.Info("test");
             Thread.Sleep(1000);
-            mgr.Dispose();	
+            mgr.Dispose();
 
         }
 
@@ -62,9 +82,9 @@ namespace CoreTechs.Logging.Tests
             var mgr = new LogManager(new[] { email });
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
 
-            var log = mgr.CreateLogger();
+            var log = mgr.GetLoggerForCallingType();
 
-            for (var i = 0; i <  10; i++)
+            for (var i = 0; i < 10; i++)
                 log.Info("test");
 
             mgr.Dispose();
@@ -79,10 +99,10 @@ namespace CoreTechs.Logging.Tests
                 Interval = LoggingInterval.Parse("1 second")
             };
 
-            var mgr = new LogManager(new[] {email});
+            var mgr = new LogManager(new[] { email });
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
 
-            var log = mgr.CreateLogger();
+            var log = mgr.GetLoggerForCallingType();
 
             for (var i = 0; i < 10000; i++)
                 log.Info("test");
@@ -90,11 +110,11 @@ namespace CoreTechs.Logging.Tests
             mgr.Dispose();
         }
 
-        [Test]
+        [Test, Explicit]
         public void LogToFilesInterval()
         {
             var fileTarget = new FileTarget();
-            var mgr = new LogManager(new[] {fileTarget});
+            var mgr = new LogManager(new[] { fileTarget });
 
             fileTarget.Configure(XElement.Parse(@"<target path=""C:\Users\roverby\Desktop\logtest"" interval=""5 second"" archivecount=""3"" />"));
 
@@ -102,30 +122,30 @@ namespace CoreTechs.Logging.Tests
             Assert.AreEqual(TimeSpan.FromSeconds(5), fileTarget.Interval.Duration);
 
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
-            var log = mgr.CreateLogger();
-            for (var i = 0; i < 1000*1000; i++)
+            var log = mgr.GetLoggerForCallingType();
+            for (var i = 0; i < 1000 * 1000; i++)
             {
                 log.Info("test");
                 log.Warn("YIKE!");
             }
-            
+
             mgr.Dispose();
         }
 
         [Test]
         public void LogToFileInDirectory()
         {
-            var fileTarget = new FileTarget {Path = @"C:\Users\roverby\Desktop\mylogz.xxx\"};
-            var mgr = new LogManager(new[] {fileTarget});
+            var fileTarget = new FileTarget { Path = @"C:\Users\roverby\Desktop\mylogz.xxx\" };
+            var mgr = new LogManager(new[] { fileTarget });
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
-            var log = mgr.CreateLogger();
+            var log = mgr.GetLoggerForCallingType();
 
             for (var i = 0; i < 10000; i++)
             {
                 log.Info("test");
                 log.Warn("YIKE!");
             }
-            
+
             mgr.Dispose();
         }
 
@@ -140,16 +160,16 @@ namespace CoreTechs.Logging.Tests
                 KeepFileOpen = true
 
             };
-            var mgr = new LogManager(new[] {fileTarget});
+            var mgr = new LogManager(new[] { fileTarget });
             mgr.UnhandledLoggingException += (sender, args) => { throw args.Exception; };
-            var log = mgr.CreateLogger();
+            var log = mgr.GetLoggerForCallingType();
 
             for (var i = 0; i < 10000; i++)
             {
                 log.Info("test");
                 log.Warn("YIKE!");
             }
-            
+
             mgr.Dispose();
         }
 
@@ -158,7 +178,7 @@ namespace CoreTechs.Logging.Tests
         {
             var logmgr = LogManager.Configure("logging");
             logmgr.UnhandledLoggingException += UnhandledException;
-            var log = logmgr.CreateLogger();
+            var log = logmgr.GetLoggerForCallingType();
             log.Data("good", 123).Info();
             logmgr.Dispose();
         }
@@ -173,7 +193,7 @@ namespace CoreTechs.Logging.Tests
         {
             var logmgr = LogManager.Configure("logging");
             logmgr.UnhandledLoggingException += UnhandledException;
-            var log = logmgr.CreateLogger();
+            var log = logmgr.GetLoggerForCallingType();
             log.Info("test");
             logmgr.Dispose();
         }
@@ -184,7 +204,7 @@ namespace CoreTechs.Logging.Tests
             var memoryTarget = new MemoryTarget { Capacity = 2 };
             var mgr = new LogManager(new[] { memoryTarget, });
             mgr.UnhandledLoggingException += UnhandledException;
-            var log = mgr.CreateLogger();
+            var log = mgr.GetLoggerForCallingType();
             log.Info("Test");
             log.Warn("something bad");
             log.Fatal("ALERT!");

@@ -5,7 +5,7 @@ namespace CoreTechs.Logging
 {
     public class Logger
     {
-        public LogManager LogManager { get; set; }
+        public LogManager LogManager { get; private set; }
 
         private const string FormatParameterName = "message";
 

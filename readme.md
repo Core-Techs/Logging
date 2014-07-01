@@ -17,9 +17,7 @@ The log manager should be a long lived object in your application. It's responsi
 The preferred way to create and initialize the `LogManager` is to use the `Configure` method:
 
 ```c#
-// LogManager.Global is just a place for your application wide LogManager
-// but you can store and access it anyway you like
-LogManager.Global = LogManager.Configure("logging");
+var logManager = LogManager.Configure("logging");
 ```
 
 
@@ -41,24 +39,24 @@ You could also configure the LogManager in the application code, if you're into 
 
 ```c#
 var console = new ConsoleTarget();
-LogManager.Global = new LogManager(new[] {console});
+var logManager = new LogManager(new[] {console});
 ```
 
 ### 2. Create a `Logger` instance
 
 When you want to log something, you'll need a `Logger` instance.
-Typically, you'll create one as a static field in each class that writes to the log:
+Typically, you'll create one as a field in each class that writes to the log:
 
 ```c#
 // create a logger with the same name as the current class
-private static readonly Logger Log = LogManager.Global.CreateLogger();
+private readonly Logger Log = _logManager.CreateLogger();
 ```
 
 The logger's name ends up being the `Source` property of each written log entry. 
 You can name the logger anything you like:
 
 ```c#
-var logger = new Logger(LogManager.Global, "My happy logger");
+var logger = new Logger(logManager, "My happy logger");
 ```
 
 ### 3. Write to the log
