@@ -89,9 +89,8 @@ namespace CoreTechs.Logging
         public void WriteLines([NotNull] string format, params object[] args)
         {
             if (format == null) throw new ArgumentNullException("format");
-            
-            var lines = string.Format(format, args ?? new object[0])
-                .Split(new[] {Environment.NewLine, "\n"}, StringSplitOptions.None);
+
+            var lines = string.Format(format, args ?? new object[0]).ReadLines();
 
             foreach (var line in lines)
                 WriteLine(line);

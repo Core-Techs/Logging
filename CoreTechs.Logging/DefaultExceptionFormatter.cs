@@ -23,7 +23,7 @@ namespace CoreTechs.Logging
                     sb.AppendLine();
                     iw.WriteLine("Exception Data:");
                     iw.Indent++;
-                    iw.WriteLines(BuildDataString(data));
+                    iw.WriteLines("{0}", BuildDataString(data));
                 }
             }
 

@@ -31,10 +31,20 @@ namespace CoreTechs.Logging
             new LogEntryBuilder(this).Trace(message, args);
         }
 
+        public void Trace(object obj)
+        {
+            new LogEntryBuilder(this).Trace(obj);
+        }
+
         [StringFormatMethod(FormatParameterName)]
         public void Debug(string message = null, params object[] args)
         {
             new LogEntryBuilder(this).Debug(message, args);
+        }
+
+        public void Debug(object obj)
+        {
+            new LogEntryBuilder(this).Debug(obj);
         }
 
         [StringFormatMethod(FormatParameterName)]
@@ -43,10 +53,20 @@ namespace CoreTechs.Logging
             new LogEntryBuilder(this).Info(message, args);
         }
 
+        public void Info(object obj)
+        {
+            new LogEntryBuilder(this).Info(obj);
+        }
+
         [StringFormatMethod(FormatParameterName)]
         public void Warn(string message = null, params object[] args)
         {
             new LogEntryBuilder(this).Warn(message, args);
+        }
+
+        public void Warn(object obj)
+        {
+            new LogEntryBuilder(this).Warn(obj);
         }
 
         [StringFormatMethod(FormatParameterName)]
@@ -55,10 +75,20 @@ namespace CoreTechs.Logging
             new LogEntryBuilder(this).Error(message, args);
         }
 
+        public void Error(object obj)
+        {
+            new LogEntryBuilder(this).Error(obj);
+        }
+
         [StringFormatMethod(FormatParameterName)]
         public void Fatal(string message = null, params object[] args)
         {
             new LogEntryBuilder(this).Fatal(message, args);
+        }
+
+        public void Fatal(object obj)
+        {
+            new LogEntryBuilder(this).Fatal(obj);
         }
 
         public LogEntryBuilder Exception(Exception exception)

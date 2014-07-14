@@ -53,10 +53,20 @@ namespace CoreTechs.Logging
             _logger.Write(Entry);
         }
 
+        public void Level(Lvl level, object obj)
+        {
+            Level(level, "{0}", obj);
+        }
+
         [StringFormatMethod(FormatParameterName)]
         public void Trace(string message = null, params object[] args)
         {
             Level(Lvl.Trace, message, args);
+        }
+
+        public void Trace(object obj)
+        {
+            Trace("{0}", obj);
         }
 
         [StringFormatMethod(FormatParameterName)]
@@ -65,10 +75,20 @@ namespace CoreTechs.Logging
             Level(Lvl.Debug, message, args);
         }
 
+        public void Debug(object obj)
+        {
+            Debug("{0}", obj);
+        }
+
         [StringFormatMethod(FormatParameterName)]
         public void Info(string message = null, params object[] args)
         {
             Level(Lvl.Info, message, args);
+        }
+
+        public void Info( object obj)
+        {
+            Info("{0}", obj);
         }
 
         [StringFormatMethod(FormatParameterName)]
@@ -77,16 +97,31 @@ namespace CoreTechs.Logging
             Level(Lvl.Warn, message, args);
         }
 
+        public void Warn( object obj)
+        {
+            Warn("{0}", obj);
+        }
+
         [StringFormatMethod(FormatParameterName)]
         public void Error(string message = null, params object[] args)
         {
             Level(Lvl.Error, message, args);
         }
 
+        public void Error(object obj)
+        {
+            Error("{0}", obj);
+        }
+
         [StringFormatMethod(FormatParameterName)]
         public void Fatal(string message = null, params object[] args)
         {
             Level(Lvl.Fatal, message, args);
+        }
+
+        public void Fatal(object obj)
+        {
+            Fatal("{0}", obj);
         }
     }
 }

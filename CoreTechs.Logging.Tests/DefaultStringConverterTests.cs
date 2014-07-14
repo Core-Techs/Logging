@@ -1,4 +1,5 @@
 ﻿using System;
+using CoreTechs.Logging.Targets;
 using NUnit.Framework;
 
 namespace CoreTechs.Logging.Tests
@@ -26,6 +27,22 @@ namespace CoreTechs.Logging.Tests
             var lb = log.Data("a", null);
             var s = new DefaultStringConverter().Convert(lb.Entry);
             Assert.True(s.Contains("a: null"));
+        }
+
+        [Test]
+        public void CanHandleAnonTypes()
+        {
+            using (var logManager = new LogManager(new[]{new ConsoleTarget()}))
+            {
+                logManager.UnhandledLoggingException += (s, e) => Console.WriteLine(e.Exception.ToString());
+
+
+                var log = logManager.GetLoggerForCallingType();
+                
+                log.Info(new { Abc = 123 });
+                log.Info(new { Abc = 123 }.ToString());
+                log.Info("{0}", new { Abc = 123 });
+            }
         }
     }
 }

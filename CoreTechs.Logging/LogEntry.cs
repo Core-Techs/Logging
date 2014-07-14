@@ -36,7 +36,21 @@ namespace CoreTechs.Logging
 
         public string GetMessage()
         {
-            return string.Format(MessageFormat ?? "", MessageArgs ?? new object[0]);
+            var format = MessageFormat ?? "";
+            var objects = MessageArgs ?? new object[0];
+
+            try
+            {
+                return string.Format(format, objects);
+            }
+            catch (FormatException)
+            {
+                // the message format likely has unintentionally unescaped format characters
+                // make an effort to auto escape them
+
+                format = format.Replace("{", "{{").Replace("}", "}}");
+                return string.Format(format, objects);
+            }
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -42,14 +40,14 @@ namespace CoreTechs.Logging
                 // entry message
                 var msg = entry.GetMessage();
                 if (!msg.IsNullOrWhitespace())
-                    iw.WriteLines(msg);
+                    iw.WriteLines("{0}", msg);
 
                 // entry data
                 foreach (var item in entry.Data)
                 {
                     // first line is written along with key
                     var lines = item.Value == null
-                        ? new[] {"null"}
+                        ? new[] { "null" }
                         : item.Value.ToString().ReadLines().GetEnumerator().AsEnumerable();
 
                     iw.WriteLine(item.Key + ": " + lines.FirstOrDefault());
@@ -65,7 +63,7 @@ namespace CoreTechs.Logging
 
                 // exception information
                 if (entry.Exception != null)
-                    iw.WriteLines(ExceptionFormatter.Format(entry.Exception));
+                    iw.WriteLines("{0}", ExceptionFormatter.Format(entry.Exception));
             }
 
             return sb.AppendLine().ToString();
