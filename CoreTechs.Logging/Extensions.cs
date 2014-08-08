@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Xml.Linq;
 
 namespace CoreTechs.Logging
@@ -94,6 +95,50 @@ namespace CoreTechs.Logging
             return
                 Attempt.Get(() => new[] {"yes", "true", "1"}.Any(x => x.Equals(s, StringComparison.OrdinalIgnoreCase)))
                     .Value;
+        }
+
+        internal static T Write<T>(this ReaderWriterLockSlim @lock, Func<T> function)
+        {
+            @lock.EnterWriteLock();
+            try
+            {
+                return function();
+            }
+            finally
+            {
+                @lock.ExitWriteLock();
+            }
+        }
+
+        internal static void Write(this ReaderWriterLockSlim @lock, Action action)
+        {
+            @lock.Write(() =>
+            {
+                action();
+                return 0;
+            });
+        }
+
+        internal static T Read<T>(this ReaderWriterLockSlim @lock, Func<T> function)
+        {
+            @lock.EnterReadLock();
+            try
+            {
+                return function();
+            }
+            finally
+            {
+                @lock.ExitReadLock();
+            }
+        }
+
+        internal static void Read(this ReaderWriterLockSlim @lock, Action action)
+        {
+            @lock.Read(() =>
+            {
+                action();
+                return 0;
+            });
         }
     }
 }

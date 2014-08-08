@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 
 namespace CoreTechs.Logging
 {
     /// <summary>
     /// Thread safe collection.
     /// </summary>
-    internal class ConcurrentCollection<T> : ICollection<T>
+    internal class ConcurrentList<T> : ICollection<T>
     {
-        private readonly ConcurrentDictionary<Guid, T> _dict = new ConcurrentDictionary<Guid, T>();
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private readonly List<T> _list = new List<T>();
 
-        public ConcurrentCollection()
+        public ConcurrentList()
         {
         }
 
-        public ConcurrentCollection(IEnumerable<T> items)
+        public ConcurrentList(IEnumerable<T> items)
         {
             if (items == null) throw new ArgumentNullException("items");
 
@@ -27,7 +27,7 @@ namespace CoreTechs.Logging
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _dict.Values.GetEnumerator();
+            return _list.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -37,37 +37,32 @@ namespace CoreTechs.Logging
 
         public void Add(T item)
         {
-            if (!_dict.TryAdd(Guid.NewGuid(), item))
-                // this should never happen because keys will always be unique
-                throw new Exception("Couldn't add the item");
+            _lock.Write(() => _list.Add(item));
         }
 
         public void Clear()
         {
-            _dict.Clear();
+            _lock.Write(_list.Clear);
         }
 
         public bool Contains(T item)
         {
-            return _dict.Values.Contains(item);
+            return _lock.Read(() => _list.Contains(item));
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            _dict.Values.CopyTo(array, arrayIndex);
+            _lock.Read(() => _list.CopyTo(array, arrayIndex));
         }
 
         public bool Remove(T item)
         {
-            T t;
-            return _dict.Where(x => x.Value.Equals(item))
-                .Select(x => _dict.TryRemove(x.Key, out t))
-                .FirstOrDefault();
+            return _lock.Write(() => _list.Remove(item));
         }
 
         public int Count
         {
-            get { return _dict.Count; }
+            get { return _lock.Read(() => _list.Count); }
         }
 
         public bool IsReadOnly
@@ -75,4 +70,6 @@ namespace CoreTechs.Logging
             get { return false; }
         }
     }
+
+    
 }

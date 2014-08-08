@@ -18,7 +18,7 @@ namespace CoreTechs.Logging
         private readonly BlockingCollection<LogEntry> _logEntries;
         private readonly Task _writer;
         private IDictionary<Type, IEntryConverter> _formatters;
-        private readonly ConcurrentCollection<Target> _targets = new ConcurrentCollection<Target>();
+        private readonly ConcurrentList<Target> _targets = new ConcurrentList<Target>();
 
         public LogManager(IEnumerable<Target> targets = null)
         {
@@ -26,7 +26,7 @@ namespace CoreTechs.Logging
             _writer = Task.Factory.StartNew(WriteQueuedEntries);
 
             if (targets != null)
-                _targets = new ConcurrentCollection<Target>(targets);
+                _targets = new ConcurrentList<Target>(targets);
         }
 
         public static LogManager Configure(string configSectionName)
