@@ -10,6 +10,10 @@
 
 ## Getting Started
 
+### 0. Installation
+
+`PM> Install-Package CoreTechs.Logging`
+
 ### 1. Create a `LogManager` instance
 
 The log manager should be a long lived object in your application. It's responsible for coordinating `LogEntry`'s and `Target`'s.
