@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -141,6 +140,11 @@ namespace CoreTechs.Logging
                     }
                     catch (Exception ex)
                     {
+                        // log if debugger is attached
+                        const int level = (int) TraceLevel.Error; // best I could come up with
+                        Debugger.Log(level, "CoreTechs.Logging Exception", ex.ToString());
+
+                        // raise event for application to handle
                         OnUnhandledLoggingException(ex);
                     }
 
