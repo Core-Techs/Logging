@@ -128,7 +128,8 @@ namespace CoreTechs.Logging.Targets
 
         public void Dispose()
         {
-            _logFile.Dispose();
+            if(_logFile != null)
+                _logFile.Dispose();
         }
     }
 }
