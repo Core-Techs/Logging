@@ -49,7 +49,7 @@ Typically, you'll create one as a field in each class that writes to the log:
 
 ```c#
 // create a logger with the same name as the current class
-private readonly Logger Log = _logManager.CreateLogger();
+private readonly Logger Log = _logManager.GetLoggerForCallingType();
 ```
 
 The logger's name ends up being the `Source` property of each written log entry. 
