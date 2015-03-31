@@ -90,7 +90,7 @@ namespace CoreTechs.Logging
         {
             if (format == null) throw new ArgumentNullException("format");
 
-            var lines = string.Format(format, args ?? new object[0]).ReadLines();
+            var lines = format.SafeFormat(args ?? new object[0]).ReadLines();
 
             foreach (var line in lines)
                 WriteLine(line);

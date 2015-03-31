@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using CoreTechs.Logging.Targets;
 using NUnit.Framework;
 
@@ -43,6 +44,22 @@ namespace CoreTechs.Logging.Tests
                 log.Info(new { Abc = 123 }.ToString());
                 log.Info("{0}", new { Abc = 123 });
             }
+        }
+
+        [Test]
+        public void CanHandleBadStringFormat()
+        {
+            Assert.AreEqual("test", "{0}".SafeFormat("test"));
+            Assert.AreEqual("test", "test".SafeFormat());
+            Assert.AreEqual("test", "test{0}".SafeFormat());
+            Assert.AreEqual("test", "{0}{1}".SafeFormat("test"));
+            Assert.AreEqual("testtest", "{2}{0}{1}{0}".SafeFormat("test"));
+            Assert.AreEqual("{test}", "{{{0}}}".SafeFormat("test"));
+            Assert.AreEqual("{0}", "{{0}}".SafeFormat("test"));
+            Assert.AreEqual("{abc123}", "{abc123}".SafeFormat());
+            Assert.AreEqual("", "{123}".SafeFormat());
+            Assert.AreEqual("{abc123}  !", "{abc123} {1} {0}".SafeFormat("!"));
+            Assert.AreEqual("{abc123}  {1}", "{abc123} {1} {0}".SafeFormat("{1}"));
         }
     }
 }

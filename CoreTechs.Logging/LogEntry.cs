@@ -38,19 +38,7 @@ namespace CoreTechs.Logging
         {
             var format = MessageFormat ?? "";
             var objects = MessageArgs ?? new object[0];
-
-            try
-            {
-                return string.Format(format, objects);
-            }
-            catch (FormatException)
-            {
-                // the message format likely has unintentionally unescaped format characters
-                // make an effort to auto escape them
-
-                format = format.Replace("{", "{{").Replace("}", "}}");
-                return string.Format(format, objects);
-            }
+            return format.SafeFormat(objects);
         }
     }
 }
