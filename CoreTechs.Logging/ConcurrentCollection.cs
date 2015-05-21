@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace CoreTechs.Logging
@@ -10,7 +11,7 @@ namespace CoreTechs.Logging
     /// </summary>
     internal class ConcurrentList<T> : ICollection<T>
     {
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private readonly List<T> _list = new List<T>();
 
         public ConcurrentList()
@@ -20,14 +21,21 @@ namespace CoreTechs.Logging
         public ConcurrentList(IEnumerable<T> items)
         {
             if (items == null) throw new ArgumentNullException("items");
-
-            foreach (var item in items)
-                Add(item);
+            _list = items.ToList();
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _list.GetEnumerator();
+            _lock.EnterReadLock();
+            try
+            {
+                foreach (var item in _list)
+                    yield return item;
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
