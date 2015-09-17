@@ -36,6 +36,11 @@ namespace CoreTechs.Logging
             // because ConfigurationManager caches the instances returned from GetSection()
             // better to cache the xml than the log manager
 
+            return Configure(xml);
+        }
+
+        public static LogManager Configure(XElement xml)
+        {
             var targets = xml.Descendants("target", StringComparison.OrdinalIgnoreCase);
             var dlc = new TargetConstructor();
             return new LogManager(targets.Select(dlc.Construct));
