@@ -46,6 +46,7 @@
     <Compile Include="DefaultExceptionFormatter.cs" />
     <Compile Include="DefaultSmtpClientCreator.cs" />
     <Compile Include="ICreateSmtpClient.cs" />
+    <Compile Include="Targets\DelegateSmtpClientFactory.cs" />
     <Compile Include="Targets\EmailTarget.cs" />
     <Compile Include="Targets\EventLogLogger.cs" />
     <Compile Include="Targets\FileTarget.cs" />

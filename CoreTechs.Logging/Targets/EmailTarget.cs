@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Mail;
 using System.Threading;
 using System.Xml.Linq;
@@ -57,7 +58,35 @@ namespace CoreTechs.Logging.Targets
             To = xml.GetAttributeValue("to");
             Subject = xml.GetAttributeValue("subject");
 
-            SmtpClientFactory = ConstructOrDefault<ICreateSmtpClient>(xml.GetAttributeValue("SmtpClientFactory"));
+            var smtpHost = xml.GetAttributeValue("smtpHost", "host");
+
+            if (smtpHost.IsNullOrWhitespace())
+            {
+                SmtpClientFactory = ConstructOrDefault<ICreateSmtpClient>(xml.GetAttributeValue("SmtpClientFactory"));
+            }
+            else
+            {
+                var smtpPort = xml.GetAttributeValue("smtpPort","port");
+                var port = smtpPort.IsNullOrWhitespace() ? (int?) null : int.Parse(smtpPort);
+
+                var user = xml.GetAttributeValue("smtpUser", "smtpusername", "username");
+                var pw = xml.GetAttributeValue("smtppassword", "password");
+
+                SmtpClientFactory =
+                    new DelegateSmtpClientFactory(
+                        () =>
+                        {
+                            var smtpClient = port.HasValue
+                                ? new SmtpClient(smtpHost, port.Value)
+                                : new SmtpClient(smtpHost);
+
+                            if (!user.IsNullOrWhitespace())
+                                smtpClient.Credentials = new NetworkCredential(user, pw);
+
+                            return smtpClient;
+                        });
+            }
+
             BodyFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("BodyFormatter"));
             SubjectFormatter = ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("SubjectFormatter"));
 
