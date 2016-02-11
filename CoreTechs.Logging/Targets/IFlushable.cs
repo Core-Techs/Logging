@@ -2,6 +2,6 @@
 {
     public interface IFlushable
     {
-        void Flush();
+        void Flush(LogManager logManager);
     }
 }

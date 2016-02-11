@@ -49,7 +49,7 @@ namespace CoreTechs.Logging
         public Logger GetLogger(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("name cannot be null or whitespace", "name");
+                throw new ArgumentException("name cannot be null or whitespace", nameof(name));
 
             return new Logger(this, name);
         }
@@ -128,7 +128,7 @@ namespace CoreTechs.Logging
         private void FlushTargets()
         {
             foreach (var target in Targets.OfType<IFlushable>())
-                target.Flush();
+                target.Flush(this);
         }
 
         private void WriteQueuedEntries()
@@ -179,12 +179,8 @@ namespace CoreTechs.Logging
 
         public event EventHandler<UnhandledLoggingExceptionEventArgs> UnhandledLoggingException;
 
-        protected virtual void OnUnhandledLoggingException(Exception ex)
-        {
-            var e = new UnhandledLoggingExceptionEventArgs(ex);
-            var handler = UnhandledLoggingException;
-            if (handler != null) handler(this, e);
-        }
+        protected internal virtual void OnUnhandledLoggingException(Exception ex) =>
+            UnhandledLoggingException?.Invoke(this, new UnhandledLoggingExceptionEventArgs(ex));
 
         public void WriteEntry(LogEntry entry)
         {

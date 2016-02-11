@@ -11,8 +11,8 @@ namespace CoreTechs.Logging
 
         public Logger([NotNull] LogManager logManager, [NotNull] string name)
         {
-            if (logManager == null) throw new ArgumentNullException("logManager");
-            if (name == null) throw new ArgumentNullException("name");
+            if (logManager == null) throw new ArgumentNullException(nameof(logManager));
+            if (name == null) throw new ArgumentNullException(nameof(name));
             LogManager = logManager;
             Name = name;
         }
@@ -21,7 +21,7 @@ namespace CoreTechs.Logging
 
         public void Write([NotNull] LogEntry entry)
         {
-            if (entry == null) throw new ArgumentNullException("entry");
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
             LogManager.WriteEntry(entry);
         }
 

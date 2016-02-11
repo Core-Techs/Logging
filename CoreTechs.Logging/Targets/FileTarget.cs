@@ -20,7 +20,7 @@ namespace CoreTechs.Logging.Targets
 
         static bool IsPathDirectory([NotNull] string path)
         {
-            if (path == null) throw new ArgumentNullException("path");
+            if (path == null) throw new ArgumentNullException(nameof(path));
             path = path.Trim();
 
             if (Directory.Exists(path)) 
@@ -61,7 +61,7 @@ namespace CoreTechs.Logging.Targets
                 _logFile = CreateLogFile(file);
             }
 
-            if (_logFile.FileInfo.Directory != null) _logFile.FileInfo.Directory.Create();
+            _logFile.FileInfo.Directory?.Create();
             var fmt = EntryFormatter ?? entry.Logger.LogManager.GetFormatter<string>();
             var msg = fmt.Convert(entry);
             _logFile.Append(msg);
@@ -128,8 +128,8 @@ namespace CoreTechs.Logging.Targets
 
         public void Dispose()
         {
-            if(_logFile != null)
-                _logFile.Dispose();
+            using(Interval)
+            using (_logFile) { }
         }
     }
 }

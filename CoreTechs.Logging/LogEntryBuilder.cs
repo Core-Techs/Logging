@@ -11,7 +11,7 @@ namespace CoreTechs.Logging
 
         public LogEntryBuilder([NotNull] Logger logger)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
             _logger = logger;
 
             Entry = new LogEntry(logger) {Source = _logger.Name};

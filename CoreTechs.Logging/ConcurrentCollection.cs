@@ -20,7 +20,7 @@ namespace CoreTechs.Logging
 
         public ConcurrentList(IEnumerable<T> items)
         {
-            if (items == null) throw new ArgumentNullException("items");
+            if (items == null) throw new ArgumentNullException(nameof(items));
             _list = items.ToList();
         }
 

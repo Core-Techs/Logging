@@ -11,7 +11,7 @@ namespace CoreTechs.Logging
     {
         public string Format([NotNull] Exception ex)
         {
-            if (ex == null) throw new ArgumentNullException("ex");
+            if (ex == null) throw new ArgumentNullException(nameof(ex));
 
             var sb = new StringBuilder(ex.ToString());
             using (var sw = new StringWriter(sb))

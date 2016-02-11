@@ -88,7 +88,7 @@ namespace CoreTechs.Logging
         [StringFormatMethod("format")]
         public void WriteLines([NotNull] string format, params object[] args)
         {
-            if (format == null) throw new ArgumentNullException("format");
+            if (format == null) throw new ArgumentNullException(nameof(format));
 
             var lines = format.SafeFormat(args ?? new object[0]).ReadLines();
 

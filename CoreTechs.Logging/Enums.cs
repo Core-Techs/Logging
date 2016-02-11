@@ -17,7 +17,7 @@ namespace CoreTechs.Logging
 
         public static TEnum Parse<TEnum>([NotNull] string s)
         {
-            if (s == null) throw new ArgumentNullException("s");
+            if (s == null) throw new ArgumentNullException(nameof(s));
             var t = typeof (TEnum);
             if (!t.IsEnum)
                 throw new InvalidOperationException("TEnum must be an enum type");

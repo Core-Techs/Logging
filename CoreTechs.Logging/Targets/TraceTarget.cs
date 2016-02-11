@@ -45,7 +45,7 @@ namespace CoreTechs.Logging.Targets
                 ConstructOrDefault<IEntryConverter<string>>(xml.GetAttributeValue("EntryFormatter", "Formatter"));
         }
 
-        public void Flush()
+        public void Flush(LogManager logMgr)
         {
             Trace.Flush();
         }

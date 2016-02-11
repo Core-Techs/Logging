@@ -10,7 +10,7 @@ namespace CoreTechs.Logging
 
         public DelegateEqualityComparer(Func<T,T,bool> equalsFunc, Func<T,int> hashCodeFunc = null)
         {
-            if (equalsFunc == null) throw new ArgumentNullException("equalsFunc");
+            if (equalsFunc == null) throw new ArgumentNullException(nameof(equalsFunc));
         
             _eq = equalsFunc;
             _hc = hashCodeFunc ?? (x => 0);

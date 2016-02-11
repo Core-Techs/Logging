@@ -5,12 +5,11 @@ using System.Net.Mail;
 using System.Threading;
 using System.Xml.Linq;
 using CoreTechs.Logging.Configuration;
-using NobleTech.Products.Library;
 
 namespace CoreTechs.Logging.Targets
 {
     [AliasTypeName("Email")]
-    public class EmailTarget : Target, IConfigurable, IFlushable
+    public class EmailTarget : Target, IConfigurable, IFlushable, IDisposable
     {
         private readonly ReaderWriterLockSlim _tempFileLock = new ReaderWriterLockSlim();
         private LoggingInterval _interval;
@@ -93,9 +92,9 @@ namespace CoreTechs.Logging.Targets
             Interval = Attempt.Get(() => LoggingInterval.Parse(xml.GetAttributeValue("interval"))).Value;
         }
 
-        public void Flush()
+        public void Flush(LogManager logMgr)
         {
-            SendBuffer();
+            SendBuffer(logMgr);
         }
 
         private LogFile GetTempFile()
@@ -108,16 +107,15 @@ namespace CoreTechs.Logging.Targets
 
         private void OnIntervalEnding(object sender, EventArgs eventArgs)
         {
-            SendBuffer();
+            SendBuffer(null /*no log manager access here TODO refactor*/);
         }
 
-        private void SendBuffer()
+        private void SendBuffer(LogManager logMgr)
         {
             // start logging to a new file
             LogFile oldFile;
-            using (var lockmgr = new ReaderWriterLockMgr(_tempFileLock))
+            using(_tempFileLock.UseWriteLock())
             {
-                lockmgr.EnterWriteLock();
                 oldFile = _tempFile;
                 _tempFile = GetTempFile();
             }
@@ -127,9 +125,9 @@ namespace CoreTechs.Logging.Targets
                 // email file
                 if (oldFile.FileInfo.Exists && oldFile.FileInfo.Length > 0)
                 {
-                    var subj = Subject ?? string.Format("{0} Log Entries", AppDomain.CurrentDomain.FriendlyName);
-                    var body = oldFile.ReadAllText(); 
-                    Send(subj, body);
+                    var subj = Subject ?? $"{AppDomain.CurrentDomain.FriendlyName} Log Entries";
+                    var body = oldFile.ReadAllText();
+                    Send(subj, body, logMgr);
                 }
 
                 // prepare for next period
@@ -149,9 +147,8 @@ namespace CoreTechs.Logging.Targets
 
         private void BufferEntry(LogEntry entry)
         {
-            using (var lockmgr = new ReaderWriterLockMgr(_tempFileLock))
+            using (_tempFileLock.UseReadLock())
             {
-                lockmgr.EnterReadLock();
                 var body = GetBody(entry);
                 _tempFile.Append(body);
             }
@@ -162,7 +159,7 @@ namespace CoreTechs.Logging.Targets
             var fmt = SubjectFormatter ?? new DefaultEmailSubjectFormatter();
             var subj = Subject ?? fmt.Convert(entry);
             var body = GetBody(entry);
-            Send(subj, body);
+            Send(subj, body, entry.Logger.LogManager);
         }
 
         private string GetBody(LogEntry entry)
@@ -172,20 +169,37 @@ namespace CoreTechs.Logging.Targets
             return body;
         }
 
-        public void Send(string subject, string body)
+        public void Send(string subject, string body, LogManager logMgr)
         {
-            using (SmtpClient smtp = SmtpClientFactory.CreateSmtpClient())
-            using (var mail = new MailMessage())
+            try
             {
-                mail.To.Add(To);
+                using (var smtp = SmtpClientFactory.CreateSmtpClient())
+                using (var mail = new MailMessage())
+                {
+                    mail.To.Add(To);
 
-                if (!From.IsNullOrWhitespace())
-                    mail.From = new MailAddress(From);
+                    if (!From.IsNullOrWhitespace())
+                        mail.From = new MailAddress(From);
 
-                mail.Subject = subject;
-                mail.Body = body;
+                    mail.Subject = subject;
+                    mail.Body = body;
 
-                smtp.Send(mail);
+                    smtp.Send(mail);
+                }
+            }
+            catch (Exception ex)
+            {
+                logMgr?.OnUnhandledLoggingException(ex);
+            }
+        }
+
+        public void Dispose()
+        {
+            using (_interval)
+            using (_tempFileLock)
+            using (_tempFile)
+            {
+
             }
         }
     }

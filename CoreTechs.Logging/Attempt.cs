@@ -381,7 +381,7 @@ namespace CoreTechs.Logging
         public static IEnumerable<Lazy<T>> UsingStrategy<T>(this IEnumerable<Lazy<T>> lazyAttempts,
             IRetryStrategy strategy, CancellationToken cancellationToken) where T : Attempt
         {
-            if (strategy == null) throw new ArgumentNullException("strategy");
+            if (strategy == null) throw new ArgumentNullException(nameof(strategy));
 
             if (strategy.AttemptLimit > 0)
                 lazyAttempts = lazyAttempts.Take(strategy.AttemptLimit.Value);

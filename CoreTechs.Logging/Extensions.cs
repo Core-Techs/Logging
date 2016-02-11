@@ -11,6 +11,29 @@ namespace CoreTechs.Logging
 {
     public static class Extensions
     {
+        public static GenericDisposable<T> AsDisposable<T>(this T obj, Action<T> onDispose)
+        {
+            return new GenericDisposable<T>(obj, onDispose);
+        }
+
+        public static GenericDisposable<ReaderWriterLockSlim> UseReadLock(this ReaderWriterLockSlim @lock)
+        {
+            @lock.EnterReadLock();
+            return @lock.AsDisposable(l => l.ExitReadLock());
+        }
+
+        public static GenericDisposable<ReaderWriterLockSlim> UseUpgradeableReadLock(this ReaderWriterLockSlim @lock)
+        {
+            @lock.EnterUpgradeableReadLock();
+            return @lock.AsDisposable(l => l.ExitUpgradeableReadLock());
+        }
+
+        public static GenericDisposable<ReaderWriterLockSlim> UseWriteLock(this ReaderWriterLockSlim @lock)
+        {
+            @lock.EnterWriteLock();
+            return @lock.AsDisposable(l => l.ExitWriteLock());
+        }
+
         internal static IEnumerable<string> ReadLines(this string s)
         {
             string line;
@@ -21,7 +44,7 @@ namespace CoreTechs.Logging
 
         internal static IEnumerable<T> AsEnumerable<T>(this IEnumerator<T> enumerator)
         {
-            if (enumerator == null) throw new ArgumentNullException("enumerator");
+            if (enumerator == null) throw new ArgumentNullException(nameof(enumerator));
 
             while (enumerator.MoveNext())
                 yield return enumerator.Current;
@@ -29,8 +52,8 @@ namespace CoreTechs.Logging
 
         internal static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (action == null) throw new ArgumentNullException("action");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (action == null) throw new ArgumentNullException(nameof(action));
 
             foreach (var item in source)
                 action(item);
@@ -46,7 +69,7 @@ namespace CoreTechs.Logging
         /// </summary>
         public static string GetAttributeValue(this XElement element, [NotNull] string name)
         {
-            if (name == null) throw new ArgumentNullException("name");
+            if (name == null) throw new ArgumentNullException(nameof(name));
 
             var attr =
                 element.Attributes()

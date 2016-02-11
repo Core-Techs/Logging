@@ -11,7 +11,7 @@ namespace CoreTechs.Logging
         {
 
             Id = Guid.NewGuid();
-            Created = DateTimeOffset.Now; if (logger == null) throw new ArgumentNullException("logger");
+            Created = DateTimeOffset.Now; if (logger == null) throw new ArgumentNullException(nameof(logger));
             Logger = logger;
         }
 

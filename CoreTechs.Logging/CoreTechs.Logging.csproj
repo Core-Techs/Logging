@@ -39,10 +39,10 @@
   <ItemGroup>
     <Compile Include="ConcurrentCollection.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
+    <Compile Include="GenericDisposable.cs" />
     <Compile Include="IConfigurable.cs" />
     <Compile Include="ILogDataSource.cs" />
     <Compile Include="LoggingInterval.cs" />
-    <Compile Include="ReaderWriterLockMgr.cs" />
     <Compile Include="DefaultExceptionFormatter.cs" />
     <Compile Include="DefaultSmtpClientCreator.cs" />
     <Compile Include="ICreateSmtpClient.cs" />

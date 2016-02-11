@@ -8,7 +8,7 @@ namespace CoreTechs.Logging.Targets
 
         public DelegateTarget([NotNull] Action<LogEntry> writeAction)
         {
-            if (writeAction == null) throw new ArgumentNullException("writeAction");
+            if (writeAction == null) throw new ArgumentNullException(nameof(writeAction));
             _writeAction = writeAction;
         }
 

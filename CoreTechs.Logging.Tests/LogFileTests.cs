@@ -44,7 +44,7 @@ namespace CoreTechs.Logging.Tests
                 lf.KeepOpen = false;
 
                 var sw = Stopwatch.StartNew();
-                for (var i = 0; i < 100000; i++) 
+                for (var i = 0; i < 10; i++) 
                     lf.Append("hey mom");
 
 

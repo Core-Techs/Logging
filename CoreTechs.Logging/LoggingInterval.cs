@@ -4,43 +4,47 @@ using System.Threading;
 
 namespace CoreTechs.Logging
 {
-    public class LoggingInterval
+    public class LoggingInterval : IDisposable
     {
-        private Timer _timer;
+        private readonly Timer _timer;
 
         public LoggingInterval(DateTimeOffset beginning, TimeSpan duration)
         {
             Beginning = beginning;
             Duration = duration;
-            InitTimer();
+            _timer = new Timer(_ => OnIntervalEnding());
         }
 
         public LoggingInterval(int n, UnitOfTime unit, DateTimeOffset? beginning = null)
         {
             Duration = unit.AsTimeSpan().Multiply(n);
             Beginning = beginning ?? Duration.LastInstanceAsOfNow();
-            InitTimer();
+            _timer = new Timer(_ => OnIntervalEnding());
         }
 
         public DateTimeOffset Beginning { get; private set; }
-        public TimeSpan Duration { get; private set; }
+        public TimeSpan Duration { get; }
 
-        public DateTimeOffset Next
-        {
-            get { return Beginning + Duration; }
-        }
-
-        private void InitTimer()
-        {
-            _timer = new Timer(_ => OnIntervalEnding());
-        }
+        public DateTimeOffset Next => Beginning + Duration;
 
         public event EventHandler IntervalEnding;
 
         protected virtual void OnIntervalEnding()
         {
-            var handler = IntervalEnding;
-            if (handler != null) handler(this, EventArgs.Empty);
+            try
+            {
+                IntervalEnding?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                // do not let exceptions go unhandled.
+                // can crash hosting application
+                // TODO not nice to swallow exception!
+                // logmanager has event for logging exceptions
+                // but no access to it from here
+                // in future, refactor stuff so logmanager 
+                // can be accessed
+            }
         }
 
         /// <summary>
@@ -64,7 +68,7 @@ namespace CoreTechs.Logging
             var match = Regex.Match(s.Trim(), @"^(?<count>\d+)\s*(?<unit>[a-zA-Z]+)$", RegexOptions.Compiled);
 
             if (!match.Success)
-                throw new FormatException(string.Format("Could not parse the string '{0}'. Valid example: 3 Day", s));
+                throw new FormatException($"Could not parse the string '{s}'. Valid example: 3 Day");
 
             var n = int.Parse(match.Groups["count"].Value);
             var value = match.Groups["unit"].Value;
@@ -90,6 +94,11 @@ namespace CoreTechs.Logging
                 dueTime = TimeSpan.Zero;
 
             _timer.Change(dueTime, TimeSpan.FromMilliseconds(-1));
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
         }
     }
 }

@@ -86,7 +86,7 @@ namespace CoreTechs.Logging.Targets
 
         internal bool ShouldWriteInternal([NotNull] LogEntry entry)
         {
-            if (entry == null) throw new ArgumentNullException("entry");
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
             var hasLevel = Levels.Contains(entry.Level);
             var matchesSource = SourceRegex == null || SourceRegex.IsMatch(entry.Source);
             var shouldWrite = hasLevel && matchesSource;

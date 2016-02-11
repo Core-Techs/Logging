@@ -17,13 +17,13 @@ namespace CoreTechs.Logging.Configuration
 
         public Target Construct([NotNull] XElement config)
         {
-            if (config == null) throw new ArgumentNullException("config");
+            if (config == null) throw new ArgumentNullException(nameof(config));
             return Construct(null, config);
         }
 
         public Target Construct(string typeName, XElement config)
         {
-            if (config == null) throw new ArgumentNullException("config");
+            if (config == null) throw new ArgumentNullException(nameof(config));
             try
             {
                 // make sure that a type name is present (explicitly passed in or through config)
@@ -31,7 +31,7 @@ namespace CoreTechs.Logging.Configuration
                 {
                     typeName = config.GetAttributeValue("type");
                     if (string.IsNullOrWhiteSpace(typeName))
-                        throw new ArgumentNullException("typeName");
+                        throw new ArgumentNullException(nameof(typeName));
                 }
 
                 // find the target type

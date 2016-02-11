@@ -8,7 +8,7 @@ namespace CoreTechs.Logging
 
         public UnhandledLoggingExceptionEventArgs([NotNull] Exception exception)
         {
-            if (exception == null) throw new ArgumentNullException("exception");
+            if (exception == null) throw new ArgumentNullException(nameof(exception));
             Exception = exception;
         }
     }

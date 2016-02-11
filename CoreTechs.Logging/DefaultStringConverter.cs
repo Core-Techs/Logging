@@ -25,7 +25,7 @@ namespace CoreTechs.Logging
 
         public virtual string Convert([NotNull] LogEntry entry)
         {
-            if (entry == null) throw new ArgumentNullException("entry");
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
 
             // entry heading
             var sb = new StringBuilder();
