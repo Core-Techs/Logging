@@ -11,24 +11,24 @@ namespace CoreTechs.Logging
 {
     public static class Extensions
     {
-        public static GenericDisposable<T> AsDisposable<T>(this T obj, Action<T> onDispose)
+        internal static GenericDisposable<T> AsDisposable<T>(this T obj, Action<T> onDispose)
         {
             return new GenericDisposable<T>(obj, onDispose);
         }
 
-        public static GenericDisposable<ReaderWriterLockSlim> UseReadLock(this ReaderWriterLockSlim @lock)
+        internal static GenericDisposable<ReaderWriterLockSlim> UseReadLock(this ReaderWriterLockSlim @lock)
         {
             @lock.EnterReadLock();
             return @lock.AsDisposable(l => l.ExitReadLock());
         }
 
-        public static GenericDisposable<ReaderWriterLockSlim> UseUpgradeableReadLock(this ReaderWriterLockSlim @lock)
+        internal static GenericDisposable<ReaderWriterLockSlim> UseUpgradeableReadLock(this ReaderWriterLockSlim @lock)
         {
             @lock.EnterUpgradeableReadLock();
             return @lock.AsDisposable(l => l.ExitUpgradeableReadLock());
         }
 
-        public static GenericDisposable<ReaderWriterLockSlim> UseWriteLock(this ReaderWriterLockSlim @lock)
+        internal static GenericDisposable<ReaderWriterLockSlim> UseWriteLock(this ReaderWriterLockSlim @lock)
         {
             @lock.EnterWriteLock();
             return @lock.AsDisposable(l => l.ExitWriteLock());
@@ -75,7 +75,7 @@ namespace CoreTechs.Logging
                 element.Attributes()
                     .FirstOrDefault(x => name.Equals(x.Name.ToString(), StringComparison.OrdinalIgnoreCase));
 
-            return attr == null ? null : attr.Value;
+            return attr?.Value;
         }
 
         /// <summary>

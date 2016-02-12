@@ -36,4 +36,4 @@ using System.Runtime.InteropServices;
 //[assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: InternalsVisibleTo("CoreTechs.Logging.Tests")]
-[assembly: AssemblyFileVersionAttribute("3.1.8.0")]
+[assembly: AssemblyFileVersionAttribute("3.1.9.0")]

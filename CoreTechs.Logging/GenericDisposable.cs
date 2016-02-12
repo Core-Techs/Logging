@@ -2,7 +2,7 @@ using System;
 
 namespace CoreTechs.Logging
 {
-    public class GenericDisposable<T> : IDisposable
+    internal class GenericDisposable<T> : IDisposable
     {
         private readonly object _mutex = new object();
         private readonly Action<T> _onDispose;
